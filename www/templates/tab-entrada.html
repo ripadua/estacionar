@@ -1,22 +1,13 @@
 <ion-view view-title="Registro de entrada">
   <ion-content class="padding">
-    <button id="lerCartao" class="button button-positive button-block icon-right ion-qr-scanner" ng-click="lerCartao()">Ler cartão</button>
     <div class="list card" >
       <form class="list">
         <label class="item item-input">
-          <span class="input-label">Cartão:</span>
-          <span class="item-note">{{container.cartao}}</span>
-        </label>
-        <label class="item item-input">
           <span class="input-label">Placa:</span>
-          <input type="text" ng-model="container.placa">
-        </label>
-        <label class="item item-input">
-          <span class="input-label">Data/Hora de entrada:</span>
-          <span class="item-note">{{container.datahora_entrada | date: 'dd/MM/yyyy HH:mm'}}</span>
+          <input type="text" ng-model="container.placa" ui-br-car-plate-mask>
         </label>
       </form>
     </div>
-    <button id="salvarEntrada" class="button button-balanced button-block icon-right ion-android-done" ng-click="salvar()">Salvar</button>
+    <button id="lerCartao" class="button button-positive button-block icon-right ion-qr-scanner" ng-click="lerCartao()">Ler cartão</button>
   </ion-content>
 </ion-view>

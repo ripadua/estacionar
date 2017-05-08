@@ -9,17 +9,44 @@
         <span class="input-label">Nome do estacionamento:</span>
         <input type="text" ng-model="container.nome">
       </label>
-      <label class="item item-input">
+      <label class="item item-input" style="display:none">
         <span class="input-label">Total de vagas:</span>
         <input type="text" ng-model="container.total_vagas">
       </label>
+      <div class="item item-divider">
+        Carro Pequeno
+      </div>
       <label class="item item-input">
-        <span class="input-label">Valor da primeira hora: R$</span>
-        <input type="text" ng-model="container.valor_primeira_hora">
+        <span class="input-label">Valor da primeira hora:</span>
+        <input type="text" ng-model="container.carro.valor_primeira_hora" ui-money-mask>
       </label>
       <label class="item item-input">
-        <span class="input-label">Valor da hora adicional: R$</span>
-        <input type="text" ng-model="container.valor_hora_adicional">
+        <span class="input-label">Valor da hora adicional:</span>
+        <input type="text" ng-model="container.carro.valor_hora_adicional" ui-money-mask>
+      </label>
+
+      <div class="item item-divider">
+        Camionete
+      </div>
+      <label class="item item-input">
+        <span class="input-label">Valor da primeira hora:</span>
+        <input type="text" ng-model="container.camionete.valor_primeira_hora" ui-money-mask>
+      </label>
+      <label class="item item-input">
+        <span class="input-label">Valor da hora adicional:</span>
+        <input type="text" ng-model="container.camionete.valor_hora_adicional" ui-money-mask>
+      </label>
+
+      <div class="item item-divider">
+        Moto
+      </div>
+      <label class="item item-input">
+        <span class="input-label">Valor da primeira hora:</span>
+        <input type="text" ng-model="container.moto.valor_primeira_hora" ui-money-mask>
+      </label>
+      <label class="item item-input">
+        <span class="input-label">Valor da hora adicional:</span>
+        <input type="text" ng-model="container.moto.valor_hora_adicional" ui-money-mask>
       </label>
     </form>
     <button class="button button-balanced button-block icon-right ion-android-done" ng-click="salvar()">Salvar</button>

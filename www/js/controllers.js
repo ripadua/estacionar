@@ -64,6 +64,19 @@ angular.module('starter.controllers', [])
       var dadosQrCode = JSON.parse(imageData.text);
       if (dadosQrCode.sistema == 'estacionar') {
         $scope.container.cartao = dadosQrCode.cartao;
+        $scope.container.datahora_entrada = new Date();
+
+        $localStorage.entradas.push($scope.container);
+
+        var popup = $ionicPopup.alert({
+          title: 'Estacionar',
+          cssClass: 'text-center',
+          template: 'Entrada registrada com sucesso. Placa: ' + $scope.container.placa + ' - Data/Hora: ' + $scope.container.datahora_entrada
+        });
+        
+        popup.then(function(res){
+          $state.go('tab.inicio');
+        });
       } else {
         $ionicPopup.alert({
           title: 'Estacionar',
