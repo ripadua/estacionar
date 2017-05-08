@@ -1,0 +1,28 @@
+<ion-view view-title="Registro de saída">
+  <ion-content class="padding">
+    <button class="button button-positive button-block icon-right ion-qr-scanner" ng-click="lerCartao()">Ler o cartão</button>
+    <div ng-show="entrada">
+	    <div class="list card" >
+	      <ion-item id="saDa-list-item7">Cartão:
+	        <span class="item-note">{{entrada.cartao}}</span>
+	      </ion-item>
+	      <ion-item id="saDa-list-item9">Placa:
+	        <span class="item-note">{{entrada.placa}}</span>
+	      </ion-item>
+	      <ion-item id="saDa-list-item10">Data/Hora de entrada:
+	        <span class="item-note">{{entrada.datahora_entrada | date: 'dd/MM/yyyy HH:mm'}}</span>
+	      </ion-item>
+	      <ion-item id="saDa-list-item11">Data/Hora de saída:
+	        <span class="item-note">{{entrada.datahora_saida | date: 'dd/MM/yyyy HH:mm'}}</span>
+	      </ion-item>
+	      <ion-item id="saDa-list-item13">Total de tempo:
+	        <span class="item-note">{{entrada.total_tempo}}</span>
+	      </ion-item>
+	      <ion-item id="saDa-list-item12">Total a pagar:
+	        <span class="item-note">R$ {{entrada.total_pagar}}</span>
+	      </ion-item>
+	    </div>
+	    <button id="saDa-button4" class="button button-balanced  button-block icon-right ion-android-done" ng-click="salvar()">Salvar</button>
+    </div>
+  </ion-content>
+</ion-view>
