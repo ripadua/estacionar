@@ -62,12 +62,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         }
       }
     })
-    .state('tab.saida', {
-      url: '/saida',
+    
+    .state('tab.despesa', {
+      url: '/despesa',
       views: {
-        'tab-saida': {
-          templateUrl: 'templates/tab-saida.html',
-          controller: 'SaidaCtrl'
+        'tab-despesa': {
+          templateUrl: 'templates/tab-despesa.html',
+          controller: 'DespesaCtrl'
         }
       }
     })
@@ -102,7 +103,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         restrict: "A",
         link: function($scope, element) {
             element.on("input", function(e) {
-                if(element.val().length == element.attr("maxlength")) {
+                if(element.val().length == element[0].maxLength) {
                     var $nextElement = element.next();
                     if($nextElement.length) {
                         $nextElement[0].focus();

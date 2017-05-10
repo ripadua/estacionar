@@ -28,6 +28,8 @@ angular.module('starter.controllers', [])
 
 .controller('InicioCtrl', function($scope, $rootScope, $localStorage, $state, $cordovaBarcodeScanner, $ionicPopup) {
 
+  $scope.saida = {};
+
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.inicio') {
@@ -58,27 +60,41 @@ angular.module('starter.controllers', [])
             totalAPagar += (diferencaMinutos/60) * $localStorage.estacionamento.carro.valor_hora_adicional;
           }
 
-          var confirmPopup = $ionicPopup.confirm({
+          registro_entrada.datahora_saida = dataHoraSaida;
+          registro_entrada.total_tempo = diferencaMinutos;
+          registro_entrada.total_pagar = totalAPagar;
+
+          $scope.saida = registro_entrada;
+
+          var confirmPopup = $ionicPopup.show({
             title: 'Estacionar',
-            template: 'Finalizar placa: ' + registro_entrada.placa + '? Valor a pagar: R$ ' + totalAPagar + '.'
+            subTitle: 'Confirmar saída?',
+            templateUrl: './templates/tab-final.html',
+            scope: $scope,
+            buttons: [{
+              text: 'Não',
+              type: 'button-default',
+              onTap: function(e) {
+                  registro_entrada.datahora_saida = undefined;
+                  registro_entrada.total_tempo = undefined;
+                  registro_entrada.total_pagar = undefined;
+                  $scope.saida = undefined;
+                }
+              }, {
+                text:'Sim',
+                type: 'button-positive',
+                onTap: function(e) {
+                  $localStorage.entradas.push(registro_entrada);
+
+                  $ionicPopup.alert({
+                    title: 'Estacionar',
+                    cssClass: 'text-center',
+                    template: 'Saída realizada com sucesso.'
+                  });
+                }
+              }
+            ]
           });
-
-           confirmPopup.then(function(res) {
-             if(res) {
-               registro_entrada.datahora_saida = dataHoraSaida;
-               registro_entrada.total_tempo = diferencaMinutos;
-               registro_entrada.total_pagar = totalAPagar;
-               $localStorage.entradas.push(registro_entrada);
-
-               $ionicPopup.alert({
-                title: 'Estacionar',
-                cssClass: 'text-center',
-                template: 'Finalização realizada com sucesso.'
-              });
-             } else {
-               
-             }
-           });
 
         } else {
           $ionicPopup.alert({
@@ -178,33 +194,33 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('SaidaCtrl', function($scope, $cordovaBarcodeScanner, $localStorage, $ionicPopup, $ionicLoading, $state) {
-  
+.controller('DespesaCtrl', function($scope, $cordovaBarcodeScanner, $localStorage, $ionicPopup, $ionicLoading, $state) {
+
   $scope.container = {
     data: new Date()
   }
 
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
-      if (toState.name == 'tab.saida') {
-        $scope.entrada = null;
+      if (toState.name == 'tab.despesa') {
+        $scope.container = {
+          data: new Date()
+        }
       }
     }
   );
-
-  
 
   $scope.salvar = function() {
 
     //Executa o loading
     $ionicLoading.show({});
 
-    $localStorage.saidas.push($scope.container);
+    $localStorage.despesas.push($scope.container);
 
     var popup = $ionicPopup.alert({
       title: 'Estacionar',
       cssClass: 'text-center',
-      template: 'Saída registrada com sucesso.'
+      template: 'Despesa registrada com sucesso.'
     });
     
     $scope.container = {
