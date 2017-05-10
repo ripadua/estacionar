@@ -17,12 +17,16 @@ angular.module('starter.controllers', [])
       $localStorage.entradas = [];
     }
 
+    if (!$localStorage.saidas) {
+      $localStorage.saidas = [];
+    }
+
     $rootScope.estacionamento = $localStorage.estacionamento;
     $rootScope.estacionamento.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
   }
 })
 
-.controller('InicioCtrl', function($scope, $rootScope, $localStorage, $state) {
+.controller('InicioCtrl', function($scope, $rootScope, $localStorage, $state, $cordovaBarcodeScanner, $ionicPopup) {
 
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
@@ -39,15 +43,67 @@ angular.module('starter.controllers', [])
   }
 
   $scope.registrarSaida = function() {
-    $state.go('tab.saida');
+    $cordovaBarcodeScanner.scan().then(function(imageData){
+      var dadosQrCode = JSON.parse(imageData.text);
+      if (dadosQrCode.sistema == 'estacionar') {
+        var entrada = $localStorage.entradas.filter(function(value){return value.cartao == dadosQrCode.cartao && !value.datahora_saida});
+
+        if (entrada.length > 0) {
+          var registro_entrada = entrada[0];
+          var dataHoraSaida = new Date();
+          var diferencaMinutos = Math.abs(dataHoraSaida - registro_entrada.datahora_entrada)/1000/60;
+          
+          var totalAPagar = $localStorage.estacionamento.carro.valor_primeira_hora;
+          if (diferencaMinutos > 60) {
+            totalAPagar += (diferencaMinutos/60) * $localStorage.estacionamento.carro.valor_hora_adicional;
+          }
+
+          var confirmPopup = $ionicPopup.confirm({
+            title: 'Estacionar',
+            template: 'Finalizar placa: ' + registro_entrada.placa + '? Valor a pagar: R$ ' + totalAPagar + '.'
+          });
+
+           confirmPopup.then(function(res) {
+             if(res) {
+               registro_entrada.datahora_saida = dataHoraSaida;
+               registro_entrada.total_tempo = diferencaMinutos;
+               registro_entrada.total_pagar = totalAPagar;
+               $localStorage.entradas.push(registro_entrada);
+
+               $ionicPopup.alert({
+                title: 'Estacionar',
+                cssClass: 'text-center',
+                template: 'Finalização realizada com sucesso.'
+              });
+             } else {
+               
+             }
+           });
+
+        } else {
+          $ionicPopup.alert({
+            title: 'Estacionar',
+            cssClass: 'text-center',
+            template: 'Não foi realizada entrada do cartão lido. Por favor ler o cartão que foi entregue ao cliente.'
+          });
+        }
+      } else {
+        $ionicPopup.alert({
+          title: 'Estacionar',
+          cssClass: 'text-center',
+          template: 'O QR code lido não é um código válido para o Estacionar. Por favor leia o cartão disponibilizado ou entre em contato com o suporte técnico.'
+        });
+      }
+    });
   }
 })
 
 .controller('EntradaCtrl', function($scope, $localStorage, $cordovaBarcodeScanner, $ionicPopup, $ionicLoading, $state) {
   
-  $scope.container = {};
-  $scope.letra_1 = "";
-  $scope.numero_1 = "";
+  $scope.container = {
+    veiculo: 'carro'
+  };
+  $scope.placa = {};
   $scope.letras = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
   $scope.numeros = [0,1,2,3,4,5,6,7,8,9];
 
@@ -55,10 +111,11 @@ angular.module('starter.controllers', [])
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.entrada') {
         $scope.container = {
-          cartao: null,
+          veiculo: 'carro',
           placa: null,
           datahora_entrada: new Date()
-        }
+        };
+        $scope.placa = {};
       }
     }
   );
@@ -69,6 +126,13 @@ angular.module('starter.controllers', [])
       if (dadosQrCode.sistema == 'estacionar') {
         $scope.container.cartao = dadosQrCode.cartao;
         $scope.container.datahora_entrada = new Date();
+
+        $scope.container.placa = "";
+        for(var i = 1; i <= 7; i++) {
+          $scope.container.placa += $scope.placa['placa_'+i];
+        }
+
+        $scope.container.placa = $scope.container.placa.toUpperCase();
 
         $localStorage.entradas.push($scope.container);
 
@@ -116,6 +180,10 @@ angular.module('starter.controllers', [])
 
 .controller('SaidaCtrl', function($scope, $cordovaBarcodeScanner, $localStorage, $ionicPopup, $ionicLoading, $state) {
   
+  $scope.container = {
+    data: new Date()
+  }
+
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.saida') {
@@ -124,46 +192,14 @@ angular.module('starter.controllers', [])
     }
   );
 
-  $scope.lerCartao = function() {
-    $cordovaBarcodeScanner.scan().then(function(imageData){
-      var dadosQrCode = JSON.parse(imageData.text);
-      if (dadosQrCode.sistema == 'estacionar') {
-        var entrada = $localStorage.entradas.filter(function(value){return value.cartao == dadosQrCode.cartao && !value.datahora_saida});
-
-        if (entrada.length > 0) {
-          $scope.entrada = entrada[0];
-          $scope.entrada.datahora_saida = new Date();
-          var diferencaMinutos = Math.abs($scope.entrada.datahora_saida - $scope.entrada.datahora_entrada)/1000/60;
-          $scope.entrada.total_tempo = diferencaMinutos;
-          var totalAPagar = $localStorage.estacionamento.valor_primeira_hora;
-          if (diferencaMinutos > 60) {
-            totalAPagar += (diferencaMinutos/60) * $localStorage.estacionamento.valor_hora_adicional;
-          }
-          $scope.entrada.total_pagar = totalAPagar;
-
-        } else {
-          $ionicPopup.alert({
-            title: 'Estacionar',
-            cssClass: 'text-center',
-            template: 'Não foi realizada entrada do cartão lido. Por favor ler o cartão que foi entregue ao cliente.'
-          });
-        }
-      } else {
-        $ionicPopup.alert({
-          title: 'Estacionar',
-          cssClass: 'text-center',
-          template: 'O QR code lido não é um código válido para o Estacionar. Por favor leia o cartão disponibilizado ou entre em contato com o suporte técnico.'
-        });
-      }
-    });
-  }
+  
 
   $scope.salvar = function() {
 
     //Executa o loading
     $ionicLoading.show({});
 
-    $localStorage.entradas.push($scope.entrada);
+    $localStorage.saidas.push($scope.container);
 
     var popup = $ionicPopup.alert({
       title: 'Estacionar',
@@ -171,12 +207,12 @@ angular.module('starter.controllers', [])
       template: 'Saída registrada com sucesso.'
     });
     
+    $scope.container = {
+      data: new Date()
+    }
+
     //Finaliza o loading
     $ionicLoading.hide();
-
-    popup.then(function(res){
-      $state.go('tab.inicio');
-    });
   }
 
 })
@@ -186,7 +222,7 @@ angular.module('starter.controllers', [])
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.relatorio') {
-        $scope.entradas = $localStorage.entradas.filter(function(value){return value && value.datahora_saida});
+        $scope.entradas = $localStorage.entradas;//.filter(function(value){return value && value.datahora_saida});
       }
     }
   );

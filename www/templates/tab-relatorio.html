@@ -2,7 +2,7 @@
   <ion-content>
     <div class="list card" >
       <ion-item ng-repeat="entrada in entradas">{{entrada.cartao}} - {{entrada.placa}}
-        <span class="item-note">{{entrada.total_pagar}}</span>
+        <span class="item-note">{{entrada.total_pagar | currency}}</span>
       </ion-item>
 	</div>
   </ion-content>
