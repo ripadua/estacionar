@@ -101,12 +101,25 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     return {
         restrict: "A",
         link: function($scope, element) {
-            element.on("input", function(e) {
+            element.bind("keyup", function(e) {
                 if(element.val().length == element.attr("maxlength")) {
                     var $nextElement = element.next();
                     if($nextElement.length) {
                         $nextElement[0].focus();
                     }
+                }
+            });
+        }
+    }
+})
+
+.directive("actionOnMaxlength", function() {
+    return {
+        restrict: "A",
+        link: function($scope, element) {
+            element.bind("keyup", function(e) {
+                if(element.val().length == element.attr("maxlength")) {
+                    $scope[element.attr("action")]();
                 }
             });
         }

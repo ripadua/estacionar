@@ -1,21 +1,21 @@
 <ion-view view-title="Registro de entrada">
   <ion-content class="padding">
     <form class="list">
+      <ion-list>
+        <ion-radio ng-model="container.veiculo" ng-value="'carro'" class="fundo_check_azul">Carro</ion-radio>
+        <ion-radio ng-model="container.veiculo" ng-value="'camionete'" class="fundo_check_azul">Camionete</ion-radio>
+        <ion-radio ng-model="container.veiculo" ng-value="'moto'" class="fundo_check_azul">Moto</ion-radio>
+      </ion-list>
       <span class="input-label">Placa:</span>
       <div class="text-center" style="margin-bottom: 20px;">
-        <input ng-model="placa.placa_1" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
-        <input ng-model="placa.placa_2" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
-        <input ng-model="placa.placa_3" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
-        <input ng-model="placa.placa_4" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
-        <input ng-model="placa.placa_5" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
-        <input ng-model="placa.placa_6" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
-        <input ng-model="placa.placa_7" maxlength="1" class="campo_placa"></input>
+        <input type="text" ng-model="placa.placa_1" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
+        <input type="text" ng-model="placa.placa_2" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
+        <input type="text" ng-model="placa.placa_3" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
+        <input type= "tel" ng-model="placa.placa_4" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
+        <input type= "tel" ng-model="placa.placa_5" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
+        <input type= "tel" ng-model="placa.placa_6" maxlength="1" class="campo_placa" move-next-on-maxlength></input>
+        <input type= "tel" ng-model="placa.placa_7" maxlength="1" class="campo_placa" action-on-maxlength action="lerCartao"></input>
       </div>
-      <ion-list>
-        <ion-radio ng-model="container.veiculo" ng-value="'carro'">Carro</ion-radio>
-        <ion-radio ng-model="container.veiculo" ng-value="'camionete'">Camionete</ion-radio>
-        <ion-radio ng-model="container.veiculo" ng-value="'moto'">Moto</ion-radio>
-      </ion-list>
     </form>
     <button id="lerCartao" class="button button-positive button-block icon-right ion-qr-scanner" ng-click="lerCartao()">Ler cartão</button>
   </ion-content>
