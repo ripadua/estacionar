@@ -62,12 +62,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         }
       }
     })
-    .state('tab.saida', {
-      url: '/saida',
+    
+    .state('tab.despesa', {
+      url: '/despesa',
       views: {
-        'tab-saida': {
-          templateUrl: 'templates/tab-saida.html',
-          controller: 'SaidaCtrl'
+        'tab-despesa': {
+          templateUrl: 'templates/tab-despesa.html',
+          controller: 'DespesaCtrl'
         }
       }
     })

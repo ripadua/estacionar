@@ -1,7 +1,8 @@
 /* Empty. Add your own CSS if you like */
 .campo_placa {
-	font-size: 30px !important;
-    width: 38px !important;
+	font-size: 25px !important;
+    width: 39px !important;
+    text-align: center;
     text-transform: uppercase !important;
     display: inline-block !important;
     border-color: #ddd !important;
