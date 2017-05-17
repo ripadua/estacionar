@@ -17,8 +17,8 @@ angular.module('starter.controllers', [])
       $localStorage.entradas = [];
     }
 
-    if (!$localStorage.saidas) {
-      $localStorage.saidas = [];
+    if (!$localStorage.despesas) {
+      $localStorage.despesas = [];
     }
 
     $rootScope.estacionamento = $localStorage.estacionamento;
@@ -137,25 +137,38 @@ angular.module('starter.controllers', [])
   );
 
   $scope.lerCartao = function() {
+    $scope.container.placa = "";
+    for(var i = 1; i <= 7; i++) {
+      if ($scope.placa['placa_'+i]) {
+        $scope.container.placa += $scope.placa['placa_'+i];
+      }
+    }
+    $scope.container.placa = $scope.container.placa.toUpperCase();
+
+    if ($scope.container.placa.length < 7) {
+      $ionicPopup.alert({
+        title: 'Estacionar',
+        cssClass: 'text-center',
+        template: 'Informe a placa do carro completa para ler o código.'
+      });
+      return;
+    }
+
     $cordovaBarcodeScanner.scan().then(function(imageData){
       var dadosQrCode = JSON.parse(imageData.text);
       if (dadosQrCode.sistema == 'estacionar') {
         $scope.container.cartao = dadosQrCode.cartao;
-        $scope.container.datahora_entrada = new Date();
-
-        $scope.container.placa = "";
-        for(var i = 1; i <= 7; i++) {
-          $scope.container.placa += $scope.placa['placa_'+i];
-        }
-
-        $scope.container.placa = $scope.container.placa.toUpperCase();
+        var date = new Date();
+        $scope.container.datahora_entrada = date;
 
         $localStorage.entradas.push($scope.container);
+
+        var dataHoraFormatada = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
 
         var popup = $ionicPopup.alert({
           title: 'Estacionar',
           cssClass: 'text-center',
-          template: 'Entrada registrada com sucesso. Placa: ' + $scope.container.placa + ' - Data/Hora: ' + $scope.container.datahora_entrada
+          template: 'Entrada registrada com sucesso. Placa: ' + $scope.container.placa + ' - Data/Hora: ' + dataHoraFormatada
         });
         
         popup.then(function(res){
@@ -170,28 +183,7 @@ angular.module('starter.controllers', [])
       }
     });
   }
-
-  $scope.salvar = function() {
-
-    //Executa o loading
-    $ionicLoading.show({});
-
-    $localStorage.entradas.push($scope.container);
-
-    var popup = $ionicPopup.alert({
-      title: 'Estacionar',
-      cssClass: 'text-center',
-      template: 'Entrada registrada com sucesso.'
-    });
-    
-    //Finaliza o loading
-    $ionicLoading.hide();
-
-    popup.then(function(res){
-      $state.go('tab.inicio');
-    });
-  }
-
+  
 })
 
 .controller('DespesaCtrl', function($scope, $cordovaBarcodeScanner, $localStorage, $ionicPopup, $ionicLoading, $state) {
@@ -215,6 +207,26 @@ angular.module('starter.controllers', [])
     //Executa o loading
     $ionicLoading.show({});
 
+    if (!$scope.container.descricao) {
+      $ionicPopup.alert({
+        title: 'Estacionar',
+        cssClass: 'text-center',
+        template: 'Informe a descrição da despesa.'
+      });
+      $ionicLoading.hide();
+      return;
+    }
+
+    if (!$scope.container.valor) {
+      $ionicPopup.alert({
+        title: 'Estacionar',
+        cssClass: 'text-center',
+        template: 'Informe o valor da despesa.'
+      });
+      $ionicLoading.hide();
+      return;
+    }
+
     $localStorage.despesas.push($scope.container);
 
     var popup = $ionicPopup.alert({
@@ -233,15 +245,74 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('RelatorioCtrl', function($scope, $localStorage) {
+.controller('CaixaCtrl', function($scope, $localStorage) {
   
+  $scope.data = new Date();
+  $scope.data.setHours(0,0,0,0);
+ 
+  calcularTotais();
+
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
-      if (toState.name == 'tab.relatorio') {
-        $scope.entradas = $localStorage.entradas;//.filter(function(value){return value && value.datahora_saida});
+      if (toState.name == 'tab.caixa') {
+        
+
+        calcularTotais();
       }
     }
   );
+
+  function calcularTotais() {
+    $scope.receitas = [];
+    $scope.despesas = [];
+    $scope.receitas = $localStorage.entradas.filter(function(value){
+      var dataEntrada = new Date(value.datahora_entrada);
+      return value 
+          && value.datahora_saida 
+          && dataEntrada.getDate() == $scope.data.getDate()
+          && dataEntrada.getMonth() == $scope.data.getMonth()
+          && dataEntrada.getFullYear() == $scope.data.getFullYear();
+    });
+    $scope.despesas = $localStorage.despesas.filter(function(value){
+      var dataDespesa = new Date(value.data);
+      return value
+          && value.data
+          && dataDespesa.getDate() == $scope.data.getDate()
+          && dataDespesa.getMonth() == $scope.data.getMonth()
+          && dataDespesa.getFullYear() == $scope.data.getFullYear();
+    });
+
+    $scope.total_receitas = 0;
+    $scope.total_despesas = 0;
+
+
+    for(r in $scope.receitas) {
+      $scope.total_receitas += $scope.receitas[r].total_pagar;
+    }
+
+    for(d in $scope.despesas) {
+      $scope.total_despesas += $scope.despesas[d].valor;
+    }
+
+    $scope.total = $scope.total_receitas - $scope.total_despesas;
+  }
+
+  $scope.navegarDataAnterior = function() {
+    $scope.data.setDate($scope.data.getDate()-1);
+    calcularTotais();
+  }
+
+  $scope.navegarDataProxima = function() {
+    $scope.data.setDate($scope.data.getDate()+1);
+    calcularTotais();
+  }
+
+  $scope.mostrarDataProxima = function() {
+    var dataAtual = new Date();
+    return $scope.data.getDate() < dataAtual.getDate()
+        && $scope.data.getMonth() <= dataAtual.getMonth()
+        && $scope.data.getFullYear() <= dataAtual.getFullYear();
+  }
 
 })
 

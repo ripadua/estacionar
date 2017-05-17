@@ -33,3 +33,11 @@
 .item-radio .radio-icon {
 	color: #ffffff;
 }
+
+toggle .toggle-header {
+    height: 30px;
+}
+
+accordion > toggle > div > div > span {
+    font-size: 14px;
+}

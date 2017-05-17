@@ -1,0 +1,63 @@
+<ion-view view-title="Caixa - {{data | date: 'dd/MM/yyyy'}}">
+	<ion-nav-buttons side="primary">
+		<button class="button button-icon icon ion-ios-arrow-left" ng-click="navegarDataAnterior()"></button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+		<button class="button button-icon icon ion-ios-arrow-right" ng-click="navegarDataProxima()" ng-show="mostrarDataProxima()"></button>
+    </ion-nav-buttons>
+  <ion-content>
+  	<div class="list">
+  		<div class="item item-divider text-right">
+	    	<div class="row">
+	    		<div class="col">
+	    			Receita
+	    		</div>
+	    		<div class="col">
+	    			Despesa
+	    		</div>
+	    	</div>
+	    </div>
+	    <div class="item">
+		    <div class="row">
+		    	<div class="col text-right">
+		    		<accordion timing="200" close-others="true">
+		    			<toggle ng-repeat="receita in receitas" 
+		    					content-url="'/templates/template-receita.html'" 
+		    					ng-model="receita" 
+		    					model-name="receita" 
+		    					heading="receita.total_pagar | currency" class="balanced"></toggle>
+		    		</accordion>
+		    	</div>
+
+		    	<div class="col text-right">
+		    		<accordion timing="200" close-others="true">
+		    			<toggle ng-repeat="despesa in despesas" 
+		    					content-url="'/templates/template-despesa.html'" 
+		    					ng-model="despesa" 
+		    					model-name="despesa" 
+		    					heading="despesa.valor | currency" class="assertive"></toggle>
+			      	</accordion>
+		    	</div>
+			</div>
+	    </div>
+	    <div class="item item-divider text-right">
+	    	<div class="row">
+	    		<div class="col balanced">
+	    			{{total_receitas | currency}}
+	    		</div>
+	    		<div class="col assertive">
+	    			{{total_despesas | currency}}
+	    		</div>
+	    	</div>
+	    </div>
+	    <div class="item item-divider">
+	    	<div class="row">
+	    		<div class="col text-right">
+	    			Total: <span ng-class="total > 0 ? 'balanced' : 'assertive'">{{total | currency}}</span>
+	    		</div>
+	    	</div>
+	    </div>
+  	</div>
+  	
+  </ion-content>
+</ion-view>
