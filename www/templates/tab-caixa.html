@@ -1,13 +1,16 @@
-<ion-view view-title="Caixa - {{data | date: 'dd/MM/yyyy'}}">
-	<ion-nav-buttons side="primary">
+<ion-view>
+	<ion-nav-title>
+		Fluxo Caixa - {{data | date: 'dd/MM/yyyy'}}
+	</ion-nav-title>
+	<ion-nav-buttons side="left">
 		<button class="button button-icon icon ion-ios-arrow-left" ng-click="navegarDataAnterior()"></button>
     </ion-nav-buttons>
-    <ion-nav-buttons side="secondary">
+    <ion-nav-buttons side="right">
 		<button class="button button-icon icon ion-ios-arrow-right" ng-click="navegarDataProxima()" ng-show="mostrarDataProxima()"></button>
     </ion-nav-buttons>
   <ion-content>
   	<div class="list">
-  		<div class="item item-divider text-right">
+  		<div class="item item-divider text-center">
 	    	<div class="row">
 	    		<div class="col">
 	    			Receita
@@ -20,39 +23,63 @@
 	    <div class="item">
 		    <div class="row">
 		    	<div class="col text-right">
-		    		<accordion timing="200" close-others="true">
-		    			<toggle ng-repeat="receita in receitas" 
-		    					content-url="'/templates/template-receita.html'" 
-		    					ng-model="receita" 
-		    					model-name="receita" 
-		    					heading="receita.total_pagar | currency" class="balanced"></toggle>
-		    		</accordion>
+		    		<ion-list>
+		    			<div ng-repeat="receita in receitas">
+		    				<ion-item class="item-stable"
+				                    ng-click="toggleGroup(receita)"
+				                    ng-class="{active: isGroupShown(receita)}">
+				              <i class="icon" ng-class="isGroupShown(receita) ? 'ion-minus' : 'ion-plus'"></i>
+				            	&nbsp;
+				            	<span class="balanced">{{receita.total_pagar | currency}}</span>
+				          	</ion-item>
+				          	<ion-item class="item-accordion"
+				                    ng-show="isGroupShown(receita)">
+				            	<div>
+									<p><span><strong>Placa:</strong> {{receita.placa}}</span></p>
+									<p><span><strong>Entrada:</strong> {{receita.datahora_entrada | date: 'HH:mm'}}</span><p>
+									<p><span><strong>Saída:</strong> {{receita.datahora_saida | date: 'HH:mm'}}</span></p>
+								</div>
+          					</ion-item>
+		    			</div>
+		    		</ion-list>
 		    	</div>
 
 		    	<div class="col text-right">
-		    		<accordion timing="200" close-others="true">
-		    			<toggle ng-repeat="despesa in despesas" 
-		    					content-url="'/templates/template-despesa.html'" 
-		    					ng-model="despesa" 
-		    					model-name="despesa" 
-		    					heading="despesa.valor | currency" class="assertive"></toggle>
-			      	</accordion>
+		    		<ion-list>
+		    			<div ng-repeat="despesa in despesas">
+		    				<ion-item class="item-stable"
+				                    ng-click="toggleGroup(despesa)"
+				                    ng-class="{active: isGroupShown(despesa)}">
+				              <i class="icon" ng-class="isGroupShown(despesa) ? 'ion-minus' : 'ion-plus'"></i>
+				            	&nbsp;
+				            	<span class="assertive">{{despesa.valor | currency}}</span>
+				          	</ion-item>
+				          	<ion-item class="item-accordion"
+				                    ng-show="isGroupShown(despesa)">
+				                   <div>
+				            			<p><span><strong>Hora:</strong> {{despesa.data | date: 'HH:mm'}}</span></p>
+				            			<p><span><strong>Desc:</strong> {{despesa.descricao}}</span></p>
+				                   </div>
+          					</ion-item>
+		    			</div>
+		    		</ion-list>
+		    		
 		    	</div>
 			</div>
 	    </div>
 	    <div class="item item-divider text-right">
 	    	<div class="row">
-	    		<div class="col balanced">
+	    		<div class="col balanced" style="margin-right: 10px;">
 	    			{{total_receitas | currency}}
 	    		</div>
-	    		<div class="col assertive">
+	    		<div class="col assertive" style="margin-right: 15px;">
 	    			{{total_despesas | currency}}
 	    		</div>
 	    	</div>
 	    </div>
 	    <div class="item item-divider">
 	    	<div class="row">
-	    		<div class="col text-right">
+	    		<div class="col text-right" style="margin-right: 15px;">
 	    			Total: <span ng-class="total > 0 ? 'balanced' : 'assertive'">{{total | currency}}</span>
 	    		</div>
 	    	</div>
