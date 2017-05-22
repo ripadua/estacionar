@@ -32,7 +32,6 @@ angular.module('starter.controllers', [])
 .controller('InicioCtrl', function($scope, $rootScope, $localStorage, $state, $cordovaBarcodeScanner, $ionicPopup) {
 
   $scope.saida = {};
-  $scope.entrada = {};
 
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
@@ -54,21 +53,24 @@ angular.module('starter.controllers', [])
     diferencaMinutos = Math.round(diferencaMinutos);
     
     var totalAPagar = 0;
+    var valor_primeira_hora = $localStorage.estacionamento[entrada.veiculo].valor_primeira_hora;
+    var valor_hora_adicional = $localStorage.estacionamento[entrada.veiculo].valor_hora_adicional;
 
     if (diferencaMinutos > $localStorage.estacionamento.tolerancia) {
-      totalAPagar += $localStorage.estacionamento.carro.valor_primeira_hora;
+      totalAPagar += valor_primeira_hora;
 
       if (multa) {
         totalAPagar += $localStorage.estacionamento.multa_perda_cartao;
       }
 
       if (diferencaMinutos > 60) {
-        totalAPagar += (diferencaMinutos/60) * $localStorage.estacionamento.carro.valor_hora_adicional;
+        totalAPagar += (diferencaMinutos/60) * valor_hora_adicional;
       }
     }
 
     entrada.datahora_saida = dataHoraSaida;
     entrada.total_tempo = diferencaMinutos;
+    entrada.valor_pago = totalAPagar;
     entrada.total_pagar = totalAPagar;
 
     $scope.saida = entrada;
@@ -136,6 +138,7 @@ angular.module('starter.controllers', [])
 
   $scope.registrarSaidaPlaca = function() {
 
+    $scope.entrada = undefined;
     $scope.entradas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida});
 
     var confirmPopup = $ionicPopup.show({
@@ -152,15 +155,24 @@ angular.module('starter.controllers', [])
           text:'Confirmar',
           type: 'button-positive',
           onTap: function(e) {
-            registrarSaida($scope.entrada, true);
+            if (!$scope.entrada) {
+              e.preventDefault();
+              $ionicPopup.alert({
+                title: 'Estacionar',
+                cssClass: 'text-center',
+                template: 'Selecione a placa para realizar a saída.'
+              });
+            } else {
+              registrarSaida($scope.entrada, true);
+            }
           }
         }
       ]
     });
   }
 
-  $scope.alterarSelecaoPlaca = function() {
-    alert($scope.entrada);
+  $scope.alterarSelecaoPlaca = function(entradaSelecionada) {
+    $scope.entrada = entradaSelecionada;
   }
 })
 

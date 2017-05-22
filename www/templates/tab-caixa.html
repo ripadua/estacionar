@@ -30,7 +30,7 @@
 				                    ng-class="{active: isGroupShown(receita)}">
 				              <i class="icon" ng-class="isGroupShown(receita) ? 'ion-minus' : 'ion-plus'"></i>
 				            	&nbsp;
-				            	<span class="balanced">{{receita.total_pagar | currency}}</span>
+				            	<span class="balanced">{{receita.valor_pago | currency}}</span>
 				          	</ion-item>
 				          	<ion-item class="item-accordion"
 				                    ng-show="isGroupShown(receita)">

@@ -16,3 +16,7 @@
 <ion-item id="saDa-list-item12">Total a pagar:
 	<span class="item-note">{{saida.total_pagar | currency}}</span>
 </ion-item>
+<label class="item item-input">
+    <span class="input-label">Valor cobrado:</span>
+    <input type="tel" ng-model="saida.valor_pago" class="campo-alinhado-direita" ui-money-mask>
+</label>
