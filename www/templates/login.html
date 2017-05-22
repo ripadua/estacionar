@@ -1,0 +1,18 @@
+<ion-view>
+  <ion-content>
+      <div class="list list-inset">
+          <div class="item text-center">
+            <img src="img/logo.png" ></img>
+          </div>
+          <form>
+            <label class="item item-input">
+              <input type="text" placeholder="Informe o usuário" ng-model="data.usuario">
+            </label>
+            <span class="item item-input">
+              <input type="password" placeholder="Informe a senha" ng-model="data.senha">
+            </span>
+          </form>
+      </div>
+      <button class="button button-block button-positive" ng-click="entrar()">Entrar</button>
+  </ion-content>
+</ion-view>
