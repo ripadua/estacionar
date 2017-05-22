@@ -252,6 +252,18 @@ angular.module('starter.controllers', [])
       //var dadosQrCode = {"sistema":"estacionar","cartao":"1"};
       if (dadosQrCode.sistema == 'estacionar') {
         $scope.container.cartao = dadosQrCode.cartao;
+
+        var entrada = $localStorage.entradas.filter(function(value){return value.cartao == dadosQrCode.cartao && !value.datahora_saida});
+
+        if (entrada.length > 0) {
+          $ionicPopup.alert({
+            title: 'Estacionar',
+            cssClass: 'text-center',
+            template: 'O QR code do cartão lido já está em uso. Por favor utilize outro cartão.'
+          });
+          return;
+        }
+
         var date = new Date();
         $scope.container.datahora_entrada = date;
 
