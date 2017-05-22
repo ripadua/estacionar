@@ -32,6 +32,7 @@ angular.module('starter.controllers', [])
 .controller('InicioCtrl', function($scope, $rootScope, $localStorage, $state, $cordovaBarcodeScanner, $ionicPopup) {
 
   $scope.saida = {};
+  $scope.entrada = {};
 
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
@@ -47,62 +48,74 @@ angular.module('starter.controllers', [])
     $state.go('tab.entrada');
   }
 
-  $scope.registrarSaida = function() {
+  function registrarSaida(entrada, multa) {
+    var dataHoraSaida = new Date();
+    var diferencaMinutos = Math.abs(dataHoraSaida - new Date(entrada.datahora_entrada))/1000/60;
+    diferencaMinutos = Math.round(diferencaMinutos);
+    
+    var totalAPagar = 0;
 
-    $cordovaBarcodeScanner.scan().then(function(imageData){
-      var dadosQrCode = JSON.parse(imageData.text);
+    if (diferencaMinutos > $localStorage.estacionamento.tolerancia) {
+      totalAPagar += $localStorage.estacionamento.carro.valor_primeira_hora;
+
+      if (multa) {
+        totalAPagar += $localStorage.estacionamento.multa_perda_cartao;
+      }
+
+      if (diferencaMinutos > 60) {
+        totalAPagar += (diferencaMinutos/60) * $localStorage.estacionamento.carro.valor_hora_adicional;
+      }
+    }
+
+    entrada.datahora_saida = dataHoraSaida;
+    entrada.total_tempo = diferencaMinutos;
+    entrada.total_pagar = totalAPagar;
+
+    $scope.saida = entrada;
+
+    var confirmPopup = $ionicPopup.show({
+      title: 'Estacionar',
+      subTitle: 'Confirmar saída?',
+      templateUrl: './templates/tab-final.html',
+      scope: $scope,
+      buttons: [{
+        text: 'Não',
+        type: 'button-default',
+        onTap: function(e) {
+            entrada.datahora_saida = undefined;
+            entrada.total_tempo = undefined;
+            entrada.total_pagar = undefined;
+            $scope.saida = undefined;
+          }
+        }, {
+          text:'Sim',
+          type: 'button-positive',
+          onTap: function(e) {
+            var popup = $ionicPopup.alert({
+              title: 'Estacionar',
+              cssClass: 'text-center',
+              template: 'Saída realizada com sucesso.'
+            });
+
+            popup.then(function(res){
+              $rootScope.estacionamento.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+            });
+          }
+        }
+      ]
+    });
+  }
+
+  $scope.registrarSaidaCartao = function() {
+
+    //$cordovaBarcodeScanner.scan().then(function(imageData){
+      //var dadosQrCode = JSON.parse(imageData.text);
       var dadosQrCode = {"sistema":"estacionar","cartao":"1"};
       if (dadosQrCode.sistema == 'estacionar') {
         var entrada = $localStorage.entradas.filter(function(value){return value.cartao == dadosQrCode.cartao && !value.datahora_saida});
 
         if (entrada.length > 0) {
-          var registro_entrada = entrada[0];
-          var dataHoraSaida = new Date();
-          var diferencaMinutos = Math.abs(dataHoraSaida - new Date(registro_entrada.datahora_entrada))/1000/60;
-          diferencaMinutos = Math.round(diferencaMinutos);
-          
-          var totalAPagar = $localStorage.estacionamento.carro.valor_primeira_hora;
-          if (diferencaMinutos > 60) {
-            totalAPagar += (diferencaMinutos/60) * $localStorage.estacionamento.carro.valor_hora_adicional;
-          }
-
-          registro_entrada.datahora_saida = dataHoraSaida;
-          registro_entrada.total_tempo = diferencaMinutos;
-          registro_entrada.total_pagar = totalAPagar;
-
-          $scope.saida = registro_entrada;
-
-          var confirmPopup = $ionicPopup.show({
-            title: 'Estacionar',
-            subTitle: 'Confirmar saída?',
-            templateUrl: './templates/tab-final.html',
-            scope: $scope,
-            buttons: [{
-              text: 'Não',
-              type: 'button-default',
-              onTap: function(e) {
-                  registro_entrada.datahora_saida = undefined;
-                  registro_entrada.total_tempo = undefined;
-                  registro_entrada.total_pagar = undefined;
-                  $scope.saida = undefined;
-                }
-              }, {
-                text:'Sim',
-                type: 'button-positive',
-                onTap: function(e) {
-                  var popup = $ionicPopup.alert({
-                    title: 'Estacionar',
-                    cssClass: 'text-center',
-                    template: 'Saída realizada com sucesso.'
-                  });
-
-                  popup.then(function(res){
-                    $rootScope.estacionamento.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
-                  });
-                }
-              }
-            ]
-          });
+          registrarSaida(entrada[0], false);
 
         } else {
           $ionicPopup.alert({
@@ -118,24 +131,75 @@ angular.module('starter.controllers', [])
           template: 'O QR code lido não é um código válido para o Estacionar. Por favor leia o cartão disponibilizado ou entre em contato com o suporte técnico.'
         });
       }
+    //});
+  }
+
+  $scope.registrarSaidaPlaca = function() {
+
+    $scope.entradas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida});
+
+    var confirmPopup = $ionicPopup.show({
+      title: 'Estacionar',
+      subTitle: 'Selecione a placa do carro:',
+      templateUrl: './templates/template-perdeu-cartao.html',
+      scope: $scope,
+      buttons: [{
+        text: 'Cancelar',
+        type: 'button-default',
+        onTap: function(e) {
+          }
+        }, {
+          text:'Confirmar',
+          type: 'button-positive',
+          onTap: function(e) {
+            registrarSaida($scope.entrada, true);
+          }
+        }
+      ]
     });
+  }
+
+  $scope.alterarSelecaoPlaca = function() {
+    alert($scope.entrada);
   }
 })
 
 .controller('EntradaCtrl', function($scope, $localStorage, $cordovaBarcodeScanner, $ionicPopup, $ionicLoading, $state) {
   
+  $scope.possuiParametroCarro = function() {
+    return $localStorage.estacionamento.carro && $localStorage.estacionamento.carro.valor_primeira_hora > 0;
+  }
+
+  $scope.possuiParametroCamionete = function() {
+    return $localStorage.estacionamento.camionete && $localStorage.estacionamento.camionete.valor_primeira_hora > 0;
+  }
+
+  $scope.possuiParametroMoto = function() {
+    return $localStorage.estacionamento.moto && $localStorage.estacionamento.moto.valor_primeira_hora > 0;
+  }
+
+  $scope.defineVeiculoPadrao = function() {
+    var veiculoPadrao = "";
+    if ($scope.possuiParametroCarro()) {
+      veiculoPadrao = "carro";
+    } else if ($scope.possuiParametroCamionete()) {
+      veiculoPadrao = "camionete";
+    } else if ($scope.possuiParametroMoto()){
+      veiculoPadrao = "moto";
+    }
+    return veiculoPadrao;
+  }
+
   $scope.container = {
-    veiculo: 'carro'
+    veiculo: $scope.defineVeiculoPadrao()
   };
   $scope.placa = {};
-  $scope.letras = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-  $scope.numeros = [0,1,2,3,4,5,6,7,8,9];
-
+  
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.entrada') {
         $scope.container = {
-          veiculo: 'carro',
+          veiculo: $scope.defineVeiculoPadrao(),
           placa: null,
           datahora_entrada: new Date()
         };
@@ -145,6 +209,15 @@ angular.module('starter.controllers', [])
   );
 
   $scope.lerCartao = function() {
+    if (!$scope.container.veiculo) {
+      $ionicPopup.alert({
+        title: 'Estacionar',
+        cssClass: 'text-center',
+        template: 'Informe o tipo de veículo. Caso não estejam aparecendo as opções, será necessário definir os valores de cobrança na tela de configurações.'
+      });
+      return;
+    }
+
     $scope.container.placa = "";
     for(var i = 1; i <= 7; i++) {
       if ($scope.placa['placa_'+i]) {
@@ -162,8 +235,8 @@ angular.module('starter.controllers', [])
       return;
     }
 
-    $cordovaBarcodeScanner.scan().then(function(imageData){
-      var dadosQrCode = JSON.parse(imageData.text);
+    //$cordovaBarcodeScanner.scan().then(function(imageData){
+      //var dadosQrCode = JSON.parse(imageData.text);
       var dadosQrCode = {"sistema":"estacionar","cartao":"1"};
       if (dadosQrCode.sistema == 'estacionar') {
         $scope.container.cartao = dadosQrCode.cartao;
@@ -190,7 +263,7 @@ angular.module('starter.controllers', [])
           template: 'O QR code lido não é um código válido para o Estacionar. Por favor leia o cartão disponibilizado ou entre em contato com o suporte técnico.'
         });
       }
-    });
+    //});
   }
   
 })
@@ -348,12 +421,11 @@ angular.module('starter.controllers', [])
 
     $localStorage.estacionamento = $scope.container;
     $rootScope.estacionamento = $scope.container;
-    $localStorage.entradas = [];
 
     var popup = $ionicPopup.alert({
       title: 'Estacionar',
       cssClass: 'text-center',
-      template: 'Configurações salvas com sucesso. Agora você pode registrar entradas e saídas de carros. Em caso de dúvidas ou sugestões, entre em contato com o suporte técnico.'
+      template: 'Configurações salvas com sucesso.'
     });
     
     //Finaliza o loading

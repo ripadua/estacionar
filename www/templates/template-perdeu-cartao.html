@@ -1,0 +1,11 @@
+<ion-item>
+	<label class="item item-input item-select">
+	    <div class="input-label">
+	      Placa
+	    </div>
+	    <select ng-model="$parent.entrada" ng-change="alterarSelecaoPlaca()">
+	    	<option value="{{entrada}}" ng-repeat="entrada in entradas">{{entrada.placa}}</option>
+	    </select>
+	  </label>
+
+</ion-item>

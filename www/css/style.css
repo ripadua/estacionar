@@ -57,3 +57,11 @@ accordion > toggle > div > div > span {
 .list .item.item-accordion.ng-hide-remove {
   display: block !important;
 }
+
+.campo-alinhado-direita {
+    position: absolute;
+    right: 16px;
+    max-width: 100px;
+    text-align: right;
+    padding: 0 !important;
+}
