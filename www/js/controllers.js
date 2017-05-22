@@ -110,9 +110,9 @@ angular.module('starter.controllers', [])
 
   $scope.registrarSaidaCartao = function() {
 
-    //$cordovaBarcodeScanner.scan().then(function(imageData){
-      //var dadosQrCode = JSON.parse(imageData.text);
-      var dadosQrCode = {"sistema":"estacionar","cartao":"1"};
+    $cordovaBarcodeScanner.scan().then(function(imageData){
+      var dadosQrCode = JSON.parse(imageData.text);
+      //var dadosQrCode = {"sistema":"estacionar","cartao":"1"};
       if (dadosQrCode.sistema == 'estacionar') {
         var entrada = $localStorage.entradas.filter(function(value){return value.cartao == dadosQrCode.cartao && !value.datahora_saida});
 
@@ -133,7 +133,7 @@ angular.module('starter.controllers', [])
           template: 'O QR code lido não é um código válido para o Estacionar. Por favor leia o cartão disponibilizado ou entre em contato com o suporte técnico.'
         });
       }
-    //});
+    });
   }
 
   $scope.registrarSaidaPlaca = function() {
@@ -247,9 +247,9 @@ angular.module('starter.controllers', [])
       return;
     }
 
-    //$cordovaBarcodeScanner.scan().then(function(imageData){
-      //var dadosQrCode = JSON.parse(imageData.text);
-      var dadosQrCode = {"sistema":"estacionar","cartao":"1"};
+    $cordovaBarcodeScanner.scan().then(function(imageData){
+      var dadosQrCode = JSON.parse(imageData.text);
+      //var dadosQrCode = {"sistema":"estacionar","cartao":"1"};
       if (dadosQrCode.sistema == 'estacionar') {
         $scope.container.cartao = dadosQrCode.cartao;
         var date = new Date();
@@ -275,7 +275,7 @@ angular.module('starter.controllers', [])
           template: 'O QR code lido não é um código válido para o Estacionar. Por favor leia o cartão disponibilizado ou entre em contato com o suporte técnico.'
         });
       }
-    //});
+    });
   }
   
 })
