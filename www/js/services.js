@@ -4,6 +4,12 @@ angular.module('starter.services', [])
   
   this.autenticarUsuario = function(data) {
     var senhaEncriptada = CryptoJS.SHA256(data.senha).toString();
-    return $http.get(ESTACIONAR_CONFIG.servidor + "/autenticarUsuario?usuario=" + data.usuario + "&senha=" + senhaEncriptada);
+    var usuario = {
+    	usuario: {
+    		login: data.login,
+    		senha: senhaEncriptada
+    	}
+    }
+    return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/usuarios/autenticarUsuario", usuario);
   }
 });

@@ -6,7 +6,7 @@
           </div>
           <form>
             <label class="item item-input">
-              <input type="text" placeholder="Informe o usuário" ng-model="data.usuario">
+              <input type="text" placeholder="Informe o login" ng-model="data.login">
             </label>
             <span class="item item-input">
               <input type="password" placeholder="Informe a senha" ng-model="data.senha">
@@ -14,5 +14,10 @@
           </form>
       </div>
       <button class="button button-block button-positive" ng-click="entrar()">Entrar</button>
+      <br/>
+      <br/>
+      <div class="text-center">
+        Versão: {{versao}}
+      </div>
   </ion-content>
 </ion-view>

@@ -462,17 +462,19 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('LoginCtrl', function($scope, $localStorage, $ionicPopup, $ionicLoading, $state, $rootScope, UsuarioService) {
+.controller('LoginCtrl', function($scope, $localStorage, $ionicPopup, $ionicLoading, $state, $rootScope, UsuarioService, ESTACIONAR_CONFIG) {
 
   $scope.data = {};
 
+  $scope.versao = ESTACIONAR_CONFIG.VERSAO_APLICACAO;
+
   $scope.entrar = function() {
     
-    if (!$scope.data.usuario) {
+    if (!$scope.data.login) {
       $ionicPopup.alert({
         title: 'Estacionar',
         cssClass: 'text-center',
-        template: 'Informe o usuário.'
+        template: 'Informe o login para entrar no Estacionar.'
       });
       return;
     }
@@ -481,7 +483,7 @@ angular.module('starter.controllers', [])
       $ionicPopup.alert({
         title: 'Estacionar',
         cssClass: 'text-center',
-        template: 'Informe a senha.'
+        template: 'Informe a senha para entrar no Estacionar.'
       });
       return;
     }
@@ -489,6 +491,8 @@ angular.module('starter.controllers', [])
     UsuarioService.autenticarUsuario($scope.data).then(function(response){
       
       $state.go('tab.inicio');
+    }, function(erro){
+      console.log(erro);
     });
 
   }
