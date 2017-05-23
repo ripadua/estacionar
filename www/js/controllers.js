@@ -460,4 +460,37 @@ angular.module('starter.controllers', [])
     });
   }
 
+})
+
+.controller('LoginCtrl', function($scope, $localStorage, $ionicPopup, $ionicLoading, $state, $rootScope, UsuarioService) {
+
+  $scope.data = {};
+
+  $scope.entrar = function() {
+    
+    if (!$scope.data.usuario) {
+      $ionicPopup.alert({
+        title: 'Estacionar',
+        cssClass: 'text-center',
+        template: 'Informe o usuário.'
+      });
+      return;
+    }
+
+    if (!$scope.data.senha) {
+      $ionicPopup.alert({
+        title: 'Estacionar',
+        cssClass: 'text-center',
+        template: 'Informe a senha.'
+      });
+      return;
+    }
+
+    UsuarioService.autenticarUsuario($scope.data).then(function(response){
+      
+      $state.go('tab.inicio');
+    });
+
+  }
+
 });
