@@ -56,7 +56,23 @@ angular.module('starter.controllers', [])
     var valor_primeira_hora = $localStorage.estacionamento[entrada.veiculo].valor_primeira_hora;
     var valor_hora_adicional = $localStorage.estacionamento[entrada.veiculo].valor_hora_adicional;
 
-    if (diferencaMinutos > $localStorage.estacionamento.tolerancia) {
+    if ($localStorage.estacionamento.tolerancia) {
+      if (diferencaMinutos > $localStorage.estacionamento.tolerancia) {
+        totalAPagar += valor_primeira_hora;
+
+        if (multa) {
+          totalAPagar += $localStorage.estacionamento.multa_perda_cartao;
+        }
+
+        if (diferencaMinutos > 60) {
+          if ($localStorage.estacionamento.cobrar_horas_quebradas) {
+            totalAPagar += Math.ceil(diferencaMinutos/60) * valor_hora_adicional;
+          } else {
+            totalAPagar += (diferencaMinutos/60) * valor_hora_adicional;
+          }
+        }
+      }
+    } else {
       totalAPagar += valor_primeira_hora;
 
       if (multa) {
@@ -64,9 +80,14 @@ angular.module('starter.controllers', [])
       }
 
       if (diferencaMinutos > 60) {
-        totalAPagar += (diferencaMinutos/60) * valor_hora_adicional;
+        if ($localStorage.estacionamento.cobrar_horas_quebradas) {
+          totalAPagar += Math.ceil(diferencaMinutos/60) * valor_hora_adicional;
+        } else {
+          totalAPagar += (diferencaMinutos/60) * valor_hora_adicional;
+        }
       }
     }
+
 
     entrada.datahora_saida = dataHoraSaida;
     entrada.total_tempo = diferencaMinutos;
