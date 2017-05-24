@@ -3,11 +3,11 @@
     <form class="list">
       <label class="item item-input">
         <span class="input-label">Usuário</span>
-        <span class="item-note">{{usuario.nome}}</span>
+        <span class="item-note campo-alinhado-direita negrito">{{usuario.nome}}</span>
       </label>
       <label class="item item-input item-stacked-label">
         <span class="input-label">Nome do estacionamento</span>
-        <input type="text" ng-model="container.nome" >
+        <input type="text" ng-model="container.nome" class="negrito">
       </label>
       <label class="item item-input" style="display:none">
         <span class="input-label">Total de vagas:</span>
@@ -15,7 +15,7 @@
       </label>
       <label class="item item-input">
         <span class="input-label">Tolerância (minutos)</span>
-        <input type="tel" ng-model="container.tolerancia" class="campo-alinhado-direita" >
+        <input type="tel" ng-model="container.tolerancia" class="campo-alinhado-direita negrito" >
       </label>
       <li class="item item-toggle">
          Cobrar horas quebradas?
@@ -28,40 +28,40 @@
       </li>
       <label class="item item-input">
         <span class="input-label">Multa perda de cartão</span>
-        <input type="tel" ng-model="container.multa_perda_cartao" class="campo-alinhado-direita" ui-money-mask>
+        <input type="tel" ng-model="container.multa_perda_cartao" class="campo-alinhado-direita negrito" ui-money-mask>
       </label>
       <div class="item item-divider">
         Carro Pequeno
       </div>
       <label class="item item-input">
         <span class="input-label">Valor da primeira hora</span>
-        <input type="tel" ng-model="container.carro.valor_primeira_hora" class="campo-alinhado-direita" ui-money-mask>
+        <input type="tel" ng-model="container.carro.valor_primeira_hora" class="campo-alinhado-direita negrito" ui-money-mask>
       </label>
       <label class="item item-input">
         <span class="input-label">Valor da hora adicional</span>
-        <input type="tel" ng-model="container.carro.valor_hora_adicional" class="campo-alinhado-direita" ui-money-mask>
+        <input type="tel" ng-model="container.carro.valor_hora_adicional" class="campo-alinhado-direita negrito" ui-money-mask>
       </label>
       <div class="item item-divider">
         Camionete
       </div>
       <label class="item item-input">
         <span class="input-label">Valor da primeira hora</span>
-        <input type="tel" ng-model="container.camionete.valor_primeira_hora" class="campo-alinhado-direita" ui-money-mask>
+        <input type="tel" ng-model="container.camionete.valor_primeira_hora" class="campo-alinhado-direita negrito" ui-money-mask>
       </label>
       <label class="item item-input">
         <span class="input-label">Valor da hora adicional</span>
-        <input type="tel" ng-model="container.camionete.valor_hora_adicional" class="campo-alinhado-direita" ui-money-mask>
+        <input type="tel" ng-model="container.camionete.valor_hora_adicional" class="campo-alinhado-direita negrito" ui-money-mask>
       </label>
       <div class="item item-divider">
         Moto
       </div>
       <label class="item item-input">
         <span class="input-label">Valor da primeira hora</span>
-        <input type="tel" ng-model="container.moto.valor_primeira_hora" class="campo-alinhado-direita" ui-money-mask>
+        <input type="tel" ng-model="container.moto.valor_primeira_hora" class="campo-alinhado-direita negrito" ui-money-mask>
       </label>
       <label class="item item-input">
         <span class="input-label">Valor da hora adicional</span>
-        <input type="tel" ng-model="container.moto.valor_hora_adicional" class="campo-alinhado-direita" ui-money-mask>
+        <input type="tel" ng-model="container.moto.valor_hora_adicional" class="campo-alinhado-direita negrito" ui-money-mask>
       </label>
       
     </form>

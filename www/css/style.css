@@ -65,3 +65,7 @@ accordion > toggle > div > div > span {
     text-align: right;
     padding: 0 !important;
 }
+
+.negrito {
+  font-weight: bold;
+}

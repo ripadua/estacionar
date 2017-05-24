@@ -468,14 +468,22 @@ angular.module('starter.controllers', [])
 
   $scope.versao = ESTACIONAR_CONFIG.VERSAO_APLICACAO;
 
+  if($localStorage.usuario) {
+    $state.go('tab.inicio');
+  }
+
   $scope.entrar = function() {
     
+    //Executa o loading
+    $ionicLoading.show({});
+
     if (!$scope.data.login) {
       $ionicPopup.alert({
         title: 'Estacionar',
         cssClass: 'text-center',
         template: 'Informe o login para entrar no Estacionar.'
       });
+      $ionicLoading.hide();
       return;
     }
 
@@ -485,14 +493,39 @@ angular.module('starter.controllers', [])
         cssClass: 'text-center',
         template: 'Informe a senha para entrar no Estacionar.'
       });
+      $ionicLoading.hide();
       return;
     }
 
     UsuarioService.autenticarUsuario($scope.data).then(function(response){
       
+      $localStorage.usuario = response.data;
+
+      $ionicLoading.hide();
       $state.go('tab.inicio');
+
     }, function(erro){
+      if (erro.status == 401) {
+        $ionicPopup.alert({
+          title: 'Estacionar',
+          cssClass: 'text-center',
+          template: 'Login ou senha inválidos. Verifique os dados informados e tente novamente.'
+        });
+      } else if (erro.status == 402) {
+        $ionicPopup.alert({
+          title: 'Estacionar',
+          cssClass: 'text-center',
+          template: 'Pagamento pendente. Por favor entre em contato com o administrador do sistema.'
+        });
+      } else {
+        $ionicPopup.alert({
+          title: 'Estacionar',
+          cssClass: 'text-center',
+          template: 'Ocorreu um erro ao entrar no sistema. Por favor tente novamente.'
+        });
+      }
       console.log(erro);
+      $ionicLoading.hide();
     });
 
   }
