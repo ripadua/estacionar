@@ -66,9 +66,9 @@ angular.module('starter.controllers', [])
 
         if (diferencaMinutos > 60) {
           if ($localStorage.estacionamento.cobrar_horas_quebradas) {
-            totalAPagar += Math.ceil(diferencaMinutos/60) * valor_hora_adicional;
+            totalAPagar += ((diferencaMinutos/60) - 1) * valor_hora_adicional;
           } else {
-            totalAPagar += (diferencaMinutos/60) * valor_hora_adicional;
+            totalAPagar += (Math.ceil(diferencaMinutos/60) - 1) * valor_hora_adicional;
           }
         }
       }
@@ -81,14 +81,20 @@ angular.module('starter.controllers', [])
 
       if (diferencaMinutos > 60) {
         if ($localStorage.estacionamento.cobrar_horas_quebradas) {
-          totalAPagar += Math.ceil(diferencaMinutos/60) * valor_hora_adicional;
+          totalAPagar += ((diferencaMinutos/60) - 1) * valor_hora_adicional;
         } else {
-          totalAPagar += (diferencaMinutos/60) * valor_hora_adicional;
+          totalAPagar += (Math.ceil(diferencaMinutos/60) - 1) * valor_hora_adicional;
         }
       }
     }
 
+    var pad = "00";
+    var strHoras = Math.floor(diferencaMinutos/60) + "";
+    var horas = pad.substring(0, pad.length - strHoras.length) + strHoras;
+    var strMinutos = (diferencaMinutos%60) + "";
+    var minutos = pad.substring(0, pad.length - strMinutos.length) + strMinutos;
 
+    entrada.total_tempo_formatado = horas + ":" + minutos;
     entrada.datahora_saida = dataHoraSaida;
     entrada.total_tempo = diferencaMinutos;
     entrada.valor_pago = totalAPagar;
@@ -308,7 +314,7 @@ angular.module('starter.controllers', [])
           template: 'O QR code lido não é um código válido para o Estacionar. Por favor leia o cartão disponibilizado ou entre em contato com o suporte técnico.'
         });
       }
-    });
+   });
   }
   
 })
@@ -393,12 +399,12 @@ angular.module('starter.controllers', [])
     $scope.receitas = [];
     $scope.despesas = [];
     $scope.receitas = $localStorage.entradas.filter(function(value){
-      var dataEntrada = new Date(value.datahora_entrada);
+      var dataSaida = new Date(value.datahora_saida);
       return value 
           && value.datahora_saida 
-          && dataEntrada.getDate() == $scope.data.getDate()
-          && dataEntrada.getMonth() == $scope.data.getMonth()
-          && dataEntrada.getFullYear() == $scope.data.getFullYear();
+          && dataSaida.getDate() == $scope.data.getDate()
+          && dataSaida.getMonth() == $scope.data.getMonth()
+          && dataSaida.getFullYear() == $scope.data.getFullYear();
     });
     $scope.despesas = $localStorage.despesas.filter(function(value){
       var dataDespesa = new Date(value.data);
