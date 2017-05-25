@@ -97,6 +97,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url: '/login',
     templateUrl: 'templates/login.html',
     controller: 'LoginCtrl'
+  })
+
+  .state('ajuda', {
+    url: '/ajuda',
+    templateUrl: 'templates/ajuda.html',
+    controller: 'AjudaCtrl'
   });
 
   // if none of the above states are matched, use this as the fallback

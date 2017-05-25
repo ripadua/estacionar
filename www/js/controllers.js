@@ -557,4 +557,8 @@ angular.module('starter.controllers', [])
 
   }
 
+})
+
+.controller('AjudaCtrl', function($scope, $localStorage, $ionicPopup, $ionicLoading, $state, $rootScope, UsuarioService, ESTACIONAR_CONFIG) {
+
 });

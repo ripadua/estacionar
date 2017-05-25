@@ -69,3 +69,14 @@ accordion > toggle > div > div > span {
 .negrito {
   font-weight: bold;
 }
+
+.label-login {
+	float: right;
+}
+
+.campo-login {
+	border-radius: 15px;
+    border: 1px lightgray solid !important;
+    padding-left: 10px !important;
+    width: 170px;
+}
