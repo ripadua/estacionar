@@ -12,4 +12,15 @@ angular.module('starter.services', [])
     }
     return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/usuarios/autenticarUsuario", usuario);
   }
+})
+
+.service('EstacionamentoService', function($http, ESTACIONAR_CONFIG) {
+  
+  this.listarEstacionamentosPorIdUsuario = function(id_usuario) {
+    return $http.get(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos/" + id_usuario);
+  }
+
+  this.listarValoresEstacionamentoPorId = function(id) {
+    return $http.get(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos/" + id + "/valores");
+  }
 });

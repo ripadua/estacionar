@@ -1,11 +1,68 @@
 angular.module('starter.controllers', [])
 
-.controller('TabsCtrl', function($rootScope, $scope, $localStorage, $state, $ionicPopup) {
+.controller('TabsCtrl', function($rootScope, $scope, $localStorage, $state, $ionicPopup, $ionicLoading, EstacionamentoService) {
 
-  if (!$localStorage.estacionamento) {
-    $localStorage.entradas = [];
-    $localStorage.despesas = [];
+  $scope.estacionamentoSelecionado = {};
 
+  $ionicLoading.show({});
+
+  EstacionamentoService.listarEstacionamentosPorIdUsuario($localStorage.usuario.id).then(function(response){
+    $ionicLoading.hide();
+
+    if (response.data.length > 1) {
+
+      $scope.listaEstacionamentos = response.data;
+
+      var confirmPopup = $ionicPopup.show({
+        title: 'Estacionar',
+        subTitle: 'Selecione o estacionamento:',
+        templateUrl: './templates/template-selecao-estacionamento.html',
+        scope: $scope,
+        buttons: [{
+            text:'Confirmar',
+            type: 'button-positive',
+            onTap: function(e) {
+              if (!$scope.estacionamentoSelecionado) {
+                e.preventDefault();
+                $ionicPopup.alert({
+                  title: 'Estacionar',
+                  cssClass: 'text-center',
+                  template: 'Selecione o estacionamento para continuar.'
+                });
+              } else {
+                $rootScope.estacionamento = $scope.estacionamentoSelecionado;
+
+                EstacionamentoService.listarValoresEstacionamentoPorId($rootScope.estacionamento.id).then(function(response){
+                  for (var x in response.data) {
+                    $rootScope.estacionamento[response.data[x].descricao] = response.data[x];
+                  }
+                  $localStorage.estacionamento = $rootScope.estacionamento;
+                });
+
+                $rootScope.estacionamento.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+              }
+            }
+          }
+        ]
+      });
+
+    } else if (response.data.length == 1) {
+      $localStorage.estacionamento = response.data[0];
+      $rootScope.estacionamento = $localStorage.estacionamento;
+      $rootScope.estacionamento.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+
+    } else {
+      var popup = $ionicPopup.alert({
+        title: 'Estacionar',
+        cssClass: 'text-center',
+        template: 'Bem vindo ao Estacionar. Para utilizar o app é necessário configurar os dados do seu estacionamento.'
+      });
+
+      popup.then(function(res){
+        $state.go('tab.configuracoes');
+      });
+    }
+  }, function(erro){
     var popup = $ionicPopup.alert({
       title: 'Estacionar',
       cssClass: 'text-center',
@@ -15,17 +72,18 @@ angular.module('starter.controllers', [])
     popup.then(function(res){
       $state.go('tab.configuracoes');
     });
-  } else {
-    if (!$localStorage.entradas) {
-      $localStorage.entradas = [];
-    }
+  });
 
-    if (!$localStorage.despesas) {
-      $localStorage.despesas = [];
-    }
+  if (!$localStorage.entradas) {
+    $localStorage.entradas = [];
+  }
 
-    $rootScope.estacionamento = $localStorage.estacionamento;
-    $rootScope.estacionamento.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+  if (!$localStorage.despesas) {
+    $localStorage.despesas = [];
+  }
+
+  $scope.alterarSelecaoEstacionamento = function(estacionamentoSelecionado) {
+    $scope.estacionamentoSelecionado = estacionamentoSelecionado;
   }
 })
 
