@@ -80,3 +80,7 @@ accordion > toggle > div > div > span {
     padding-left: 10px !important;
     width: 170px;
 }
+
+.item-content {
+  white-space: pre-line;
+}

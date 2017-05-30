@@ -13,22 +13,22 @@ navigation history that also transitions its views in and out.
 <ion-tabs class="tabs-icon-bottom tabs-color-active-positive tabs-bottom">
 
   <!-- Inicio Tab -->
-  <ion-tab title="Início" icon="ion-android-home" href="#/tab/inicio" >
+  <ion-tab title="Início" icon="ion-android-home" href="#/tab/inicio" ng-if="estacionamento.id">
     <ion-nav-view name="tab-inicio"></ion-nav-view>
   </ion-tab>
 
   <!-- Entrada Tab -->
-  <ion-tab title="Entrada" icon="ion-android-car" href="#/tab/entrada" >
+  <ion-tab title="Entrada" icon="ion-android-car" href="#/tab/entrada" ng-if="estacionamento.id">
     <ion-nav-view name="tab-entrada"></ion-nav-view>
   </ion-tab>
 
   <!-- Saída Tab -->
-  <ion-tab title="Despesa" icon="ion-cash" href="#/tab/despesa" >
+  <ion-tab title="Despesa" icon="ion-cash" href="#/tab/despesa" ng-if="estacionamento.id">
     <ion-nav-view name="tab-despesa"></ion-nav-view>
   </ion-tab>
 
   <!-- Caixa Tab -->
-  <ion-tab title="Caixa" icon="ion-ios-list" href="#/tab/caixa" >
+  <ion-tab title="Caixa" icon="ion-ios-list" href="#/tab/caixa" ng-if="estacionamento.id">
     <ion-nav-view name="tab-caixa"></ion-nav-view>
   </ion-tab>
 

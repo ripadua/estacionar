@@ -23,4 +23,8 @@ angular.module('starter.services', [])
   this.listarValoresEstacionamentoPorId = function(id) {
     return $http.get(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos/" + id + "/valores");
   }
+
+  this.salvarEstacionamento = function(estacionamento) {
+    return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos", estacionamento);
+  }
 });

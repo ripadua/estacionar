@@ -1,10 +1,5 @@
 <ion-item>
-	<label class="item item-input item-select">
-	    <div class="input-label">
-	    </div>
-	    <select ng-model="estacionamentoSelecionado" ng-change="alterarSelecaoEstacionamento(estacionamentoSelecionado)" ng-options="estacionamento as estacionamento.nome for estacionamento in listaEstacionamentos">
-	    	
-	    </select>
-	  </label>
-
+	<ion-list>
+		<ion-radio ng-model="estacionamentoSelecionado" ng-click="alterarSelecaoEstacionamento(estacionamento)" class="fundo_check_azul" ng-repeat="estacionamento in listaEstacionamentos">{{estacionamento.nome}}</ion-radio>
+	</ion-list>
 </ion-item>
