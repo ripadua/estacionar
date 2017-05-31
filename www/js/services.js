@@ -27,4 +27,12 @@ angular.module('starter.services', [])
   this.salvarEstacionamento = function(estacionamento) {
     return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos", estacionamento);
   }
+})
+
+.service('TipoVeiculoService', function($http, ESTACIONAR_CONFIG) {
+  
+  this.listarTiposVeiculos = function(id_usuario) {
+    return $http.get(ESTACIONAR_CONFIG.SERVIDOR + "/tiposVeiculos");
+  }
+
 });

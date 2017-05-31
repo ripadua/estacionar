@@ -83,13 +83,14 @@ angular.module('starter.controllers', [])
   function consultarValores(estacionamento) {
     $rootScope.estacionamento = estacionamento;
     EstacionamentoService.listarValoresEstacionamentoPorId($rootScope.estacionamento.id).then(function(response){
+      $rootScope.estacionamento.estacionamentoValores = [];
       for (var x in response.data) {
-          $rootScope.estacionamento[response.data[x].descricao] = response.data[x];
+          $rootScope.estacionamento.estacionamentoValores.push(response.data[x]);
       }
       $localStorage.estacionamento = $rootScope.estacionamento;
     });
       
-    $rootScope.estacionamento.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+    $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
   }
 })
 
@@ -101,7 +102,7 @@ angular.module('starter.controllers', [])
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.inicio') {
         if ($rootScope.estacionamento) {
-          $rootScope.estacionamento.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+          $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
         }
       }
     }
@@ -191,7 +192,7 @@ angular.module('starter.controllers', [])
             });
 
             popup.then(function(res){
-              $rootScope.estacionamento.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+              $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
             });
           }
         }
@@ -234,7 +235,7 @@ angular.module('starter.controllers', [])
 
     var confirmPopup = $ionicPopup.show({
       title: 'Estacionar',
-      subTitle: 'Selecione a placa do carro:',
+      subTitle: 'Selecione a placa do veículo:',
       templateUrl: './templates/template-perdeu-cartao.html',
       scope: $scope,
       buttons: [{
@@ -251,7 +252,7 @@ angular.module('starter.controllers', [])
               $ionicPopup.alert({
                 title: 'Estacionar',
                 cssClass: 'text-center',
-                template: 'Selecione a placa para realizar a saída.'
+                template: 'Selecione a placa do veículo para realizar a saída.'
               });
             } else {
               registrarSaida($scope.entrada, true);
@@ -269,44 +270,36 @@ angular.module('starter.controllers', [])
 
 .controller('EntradaCtrl', function($scope, $localStorage, $cordovaBarcodeScanner, $ionicPopup, $ionicLoading, $state) {
   
-  $scope.possuiParametroCarro = function() {
-    return $localStorage.estacionamento.Carro && $localStorage.estacionamento.Carro.valor_primeira_hora > 0;
-  }
+  function validarTiposVeiculos() {
+    $scope.tiposVeiculos = $localStorage.estacionamento.estacionamentoValores.filter(function(value){return value.valor_primeira_hora && value.valor_primeira_hora > 0});
 
-  $scope.possuiParametroCaminhonete = function() {
-    return $localStorage.estacionamento.Caminhonete && $localStorage.estacionamento.Caminhonete.valor_primeira_hora > 0;
-  }
+    if ($scope.tiposVeiculos.length == 0) {
+      var popup = $ionicPopup.alert({
+        title: 'Estacionar',
+        cssClass: 'text-center',
+        template: 'É necessário configurar os valores de cobrança para os tipos de veículos para realizar uma entrada.'
+      });
 
-  $scope.possuiParametroMoto = function() {
-    return $localStorage.estacionamento.Moto && $localStorage.estacionamento.Moto.valor_primeira_hora > 0;
-  }
-
-  $scope.defineVeiculoPadrao = function() {
-    var veiculoPadrao = "";
-    if ($scope.possuiParametroCarro()) {
-      veiculoPadrao = "Carro";
-    } else if ($scope.possuiParametroCaminhonete()) {
-      veiculoPadrao = "Caminhonete";
-    } else if ($scope.possuiParametroMoto()){
-      veiculoPadrao = "Moto";
+      popup.then(function(res){
+        $state.go('tab.configuracoes');
+      });
+    } else {
+      $scope.container = {
+        veiculo: $scope.tiposVeiculos[0].id_tipo_veiculo,
+        placa: null,
+        datahora_entrada: new Date()
+      };
+      $scope.placa = {};
     }
-    return veiculoPadrao;
   }
 
-  $scope.container = {
-    veiculo: $scope.defineVeiculoPadrao()
-  };
-  $scope.placa = {};
+  //validarTiposVeiculos();
   
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.entrada') {
-        $scope.container = {
-          veiculo: $scope.defineVeiculoPadrao(),
-          placa: null,
-          datahora_entrada: new Date()
-        };
-        $scope.placa = {};
+        validarTiposVeiculos();
+        
       }
     }
   );
@@ -333,7 +326,7 @@ angular.module('starter.controllers', [])
       $ionicPopup.alert({
         title: 'Estacionar',
         cssClass: 'text-center',
-        template: 'Informe a placa do carro completa para ler o código.'
+        template: 'Informe a placa do veículo completa para ler o código.'
       });
       return;
     }
@@ -524,10 +517,22 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('ConfiguracoesCtrl', function($scope, $localStorage, $ionicPopup, $ionicLoading, $state, $rootScope, EstacionamentoService) {
+.controller('ConfiguracoesCtrl', function($scope, $localStorage, $ionicPopup, $ionicLoading, $state, $rootScope, EstacionamentoService, TipoVeiculoService) {
   
   $scope.usuario = $localStorage.usuario || {};
   $scope.container = $localStorage.estacionamento || {};
+
+  if (!$scope.container.estacionamentoValores || $scope.container.estacionamentoValores.length == 0) {
+    $scope.container.estacionamentoValores = [];
+    TipoVeiculoService.listarTiposVeiculos().then(function(response){
+      for (var x in response.data) {
+        $scope.container.estacionamentoValores.push({
+          id_tipo_veiculo: response.data[x].id,
+          descricao: response.data[x].descricao
+        });
+      }
+    })
+  }
 
   $scope.salvar = function() {
     
@@ -541,8 +546,12 @@ angular.module('starter.controllers', [])
 
     EstacionamentoService.salvarEstacionamento(data).then(function(response){
 
-      $localStorage.estacionamento = response.data;
-      $rootScope.estacionamento = response.data;
+      if(response.data.insertId) {
+        $scope.container.id = response.data.insertId;
+      }
+
+      $localStorage.estacionamento = $scope.container;
+      $rootScope.estacionamento = $scope.container;
 
       $ionicPopup.alert({
         title: 'Estacionar',
