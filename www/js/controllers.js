@@ -118,8 +118,9 @@ angular.module('starter.controllers', [])
     diferencaMinutos = Math.round(diferencaMinutos);
     
     var totalAPagar = 0;
-    var valor_primeira_hora = $localStorage.estacionamento[entrada.veiculo].valor_primeira_hora;
-    var valor_hora_adicional = $localStorage.estacionamento[entrada.veiculo].valor_hora_adicional;
+    var estacionamentoValor = $localStorage.estacionamento.estacionamentoValores.filter(function(value){return value.id_tipo_veiculo == entrada.veiculo})[0];
+    var valor_primeira_hora = estacionamentoValor.valor_primeira_hora;
+    var valor_hora_adicional = estacionamentoValor.valor_hora_adicional;
 
     if ($localStorage.estacionamento.tolerancia) {
       if (diferencaMinutos > $localStorage.estacionamento.tolerancia) {
