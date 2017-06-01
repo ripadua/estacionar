@@ -24,6 +24,10 @@ angular.module('starter.services', [])
     return $http.get(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos/" + id + "/valores");
   }
 
+  this.listarEntradasPorId = function(id) {
+    return $http.get(ESTACIONAR_CONFIG.SERVIDOR + '/estacionamentos/' + id + "/entradas");
+  }
+
   this.salvarEstacionamento = function(estacionamento) {
     return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos", estacionamento);
   }
@@ -33,6 +37,22 @@ angular.module('starter.services', [])
   
   this.listarTiposVeiculos = function(id_usuario) {
     return $http.get(ESTACIONAR_CONFIG.SERVIDOR + "/tiposVeiculos");
+  }
+
+})
+
+.service('EntradaService', function($http, ESTACIONAR_CONFIG) {
+  
+  this.salvar = function(entrada) {
+    delete entrada.total_tempo_formatado;
+    var data = {
+      entrada: entrada
+    }
+    if (data.entrada.id) {
+      return $http.put(ESTACIONAR_CONFIG.SERVIDOR + "/entradas", data);
+    } else {
+      return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/entradas", data);
+    }
   }
 
 });
