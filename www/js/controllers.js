@@ -322,6 +322,10 @@ angular.module('starter.controllers', [])
       possui = true;
     }
 
+    if ($localStorage.entradas.filter(function(value){return value.sincronizar}).length > 0) {
+      possui = true;
+    }
+
     if ($localStorage.despesas.filter(function(value){return value.sincronizar}).length > 0) {
       possui = true;
     }
