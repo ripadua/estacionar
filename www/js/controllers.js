@@ -494,7 +494,7 @@ angular.module('starter.controllers', [])
     }
   }
 
-  //validarTiposVeiculos();
+  validarTiposVeiculos();
   
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
