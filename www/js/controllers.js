@@ -98,6 +98,8 @@ angular.module('starter.controllers', [])
           $scope.estacionamento.estacionamentoValores.push(response.data[x]);
       }
       $localStorage.estacionamento = $scope.estacionamento;
+    }, function(erro){
+      $localStorage.estacionamento = $scope.estacionamento;
     });
     
     EstacionamentoService.listarEntradasPorId($scope.estacionamento.id).then(function(response){
