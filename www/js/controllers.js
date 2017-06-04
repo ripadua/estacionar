@@ -4,69 +4,79 @@ angular.module('starter.controllers', [])
 
   $scope.estacionamentoSelecionado = {};
 
-  $ionicLoading.show({});
+  if ($localStorage.estacionamento && $localStorage.estacionamento.sincronizar) {
+    $scope.estacionamento = $localStorage.estacionamento;
+  } else {
 
-  EstacionamentoService.listarEstacionamentosPorIdUsuario($localStorage.usuario.id).then(function(response){
-    $ionicLoading.hide();
+    $ionicLoading.show({});
+    EstacionamentoService.listarEstacionamentosPorIdUsuario($localStorage.usuario.id).then(function(response){
+      $ionicLoading.hide();
 
-    if (response.data.length > 1) {
+      if (response.data.length > 1) {
 
-      $scope.listaEstacionamentos = response.data;
+        $scope.listaEstacionamentos = response.data;
 
-      var confirmPopup = $ionicPopup.show({
-        title: 'Estacionar',
-        subTitle: 'Selecione o estacionamento:',
-        templateUrl: './templates/template-selecao-estacionamento.html',
-        scope: $scope,
-        buttons: [{
-            text:'Confirmar',
-            type: 'button-positive',
-            onTap: function(e) {
-              if (!$scope.estacionamentoSelecionado.id) {
-                e.preventDefault();
-                $ionicPopup.alert({
-                  title: 'Estacionar',
-                  cssClass: 'text-center',
-                  template: 'Selecione o estacionamento para continuar.'
-                });
-              } else {
-                consultarValores($scope.estacionamentoSelecionado);
+        var confirmPopup = $ionicPopup.show({
+          title: 'Estacionar',
+          subTitle: 'Selecione o estacionamento:',
+          templateUrl: './templates/template-selecao-estacionamento.html',
+          scope: $scope,
+          buttons: [{
+              text:'Confirmar',
+              type: 'button-positive',
+              onTap: function(e) {
+                if (!$scope.estacionamentoSelecionado.id) {
+                  e.preventDefault();
+                  $ionicPopup.alert({
+                    title: 'Estacionar',
+                    cssClass: 'text-center',
+                    template: 'Selecione o estacionamento para continuar.'
+                  });
+                } else {
+                  consultarValores($scope.estacionamentoSelecionado);
 
+                }
               }
             }
-          }
-        ]
-      });
+          ]
+        });
 
-    } else if (response.data.length == 1) {
-      consultarValores(response.data[0]);
+      } else if (response.data.length == 1) {
+        consultarValores(response.data[0]);
 
-    } else {
+      } else {
 
-      $localStorage.estacionamento = {};
-      $rootScope.estacionamento = {};
+        $localStorage.estacionamento = {};
 
-      var popup = $ionicPopup.alert({
-        title: 'Estacionar',
-        cssClass: 'text-center',
-        template: 'Bem vindo ao Estacionar. Para utilizar o app é necessário configurar os dados do seu estacionamento.'
-      });
+        var popup = $ionicPopup.alert({
+          title: 'Estacionar',
+          cssClass: 'text-center',
+          template: 'Bem vindo ao Estacionar. Para utilizar o app é necessário configurar os dados do seu estacionamento.'
+        });
 
-      popup.then(function(res){
-        $state.go('tab.configuracoes');
-      });
-    }
-  }, function(erro){
-    var popup = $ionicPopup.alert({
-      title: 'Estacionar',
-      cssClass: 'text-center',
-      template: 'Bem vindo ao Estacionar. Para utilizar o app é necessário configurar os dados do seu estacionamento.'
+        popup.then(function(res){
+          $state.go('tab.configuracoes');
+        });
+      }
+    }, function(erro){
+      $ionicLoading.hide();
+
+      if ($localStorage.estacionamento) {
+        $scope.estacionamento = $localStorage.estacionamento;
+      } else {
+        var popup = $ionicPopup.alert({
+          title: 'Estacionar',
+          cssClass: 'text-center',
+          template: 'Bem vindo ao Estacionar. Para configurar o aplicativo pela primeira vez é necessário ter uma conexão ativa. Por favor habilite sua conexão e realize o login novamente.'
+        });
+
+        popup.then(function(res){
+          $localStorage.usuario = undefined;
+          $state.go('login');
+        });
+      }
     });
-
-    popup.then(function(res){
-      $state.go('tab.configuracoes');
-    });
-  });
+  }
 
   if (!$localStorage.entradas) {
     $localStorage.entradas = [];
@@ -81,37 +91,30 @@ angular.module('starter.controllers', [])
   }
 
   function consultarValores(estacionamento) {
-    $rootScope.estacionamento = estacionamento;
-    EstacionamentoService.listarValoresEstacionamentoPorId($rootScope.estacionamento.id).then(function(response){
-      $rootScope.estacionamento.estacionamentoValores = [];
+    $scope.estacionamento = estacionamento;
+    EstacionamentoService.listarValoresEstacionamentoPorId($scope.estacionamento.id).then(function(response){
+      $scope.estacionamento.estacionamentoValores = [];
       for (var x in response.data) {
-          $rootScope.estacionamento.estacionamentoValores.push(response.data[x]);
+          $scope.estacionamento.estacionamentoValores.push(response.data[x]);
       }
-      $localStorage.estacionamento = $rootScope.estacionamento;
+      $localStorage.estacionamento = $scope.estacionamento;
     });
     
-    EstacionamentoService.listarEntradasPorId($rootScope.estacionamento.id).then(function(response){
-      $localStorage.entradas = response.data;
-
-      $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
-    });
-
+    $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
   }
 })
 
-.controller('InicioCtrl', function($scope, $rootScope, $localStorage, $state, $cordovaBarcodeScanner, $ionicPopup, EntradaService, EstacionamentoService) {
+.controller('InicioCtrl', function($scope, $rootScope, $localStorage, $state, $cordovaBarcodeScanner, $ionicPopup, $ionicLoading, EntradaService, EstacionamentoService, DespesaService) {
 
   $scope.saida = {};
+
+  $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
 
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.inicio') {
-        if ($rootScope.estacionamento) {
-          EstacionamentoService.listarEntradasPorId($rootScope.estacionamento.id).then(function(response){
-            $localStorage.entradas = response.data;
-            
-            $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
-          });
+        if ($localStorage.estacionamento) {
+          $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
         }
       }
     }
@@ -195,33 +198,30 @@ angular.module('starter.controllers', [])
           text:'Sim',
           type: 'button-positive',
           onTap: function(e) {
-            EntradaService.salvar($scope.saida).then(function(response) {
-
-              var popup = $ionicPopup.alert({
-                title: 'Estacionar',
-                cssClass: 'text-center',
-                template: 'Saída realizada com sucesso.'
-              });
-
-              popup.then(function(res){
-                EstacionamentoService.listarEntradasPorId($rootScope.estacionamento.id).then(function(response){
-                  $localStorage.entradas = response.data;
-                  
-                  $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
-                });
-              });
-            }, function(erro) {
-              $ionicPopup.alert({
-                title: 'Estacionar',
-                cssClass: 'text-center',
-                template: 'Ocorreu um erro ao realizar a saída.'
-              });
+            var popup = $ionicPopup.alert({
+              title: 'Estacionar',
+              cssClass: 'text-center',
+              template: 'Saída realizada com sucesso.'
             });
           }
         }
       ]
     });
   }
+
+  $scope.$on('salvar-saida', function(event, saida){
+    EntradaService.salvar(saida).then(function(response){
+      var index = $localStorage.entradas.indexOf(saida);
+      $localStorage.entradas[index] = response.data;
+      $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+    }, function(erro){
+      saida.sincronizar = true;
+      var index = $localStorage.entradas.indexOf(saida);
+      $localStorage.entradas[index] = saida;
+      $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+      console.log(erro);
+    });
+  });
 
   $scope.registrarSaidaCartao = function() {
 
@@ -289,6 +289,155 @@ angular.module('starter.controllers', [])
   $scope.alterarSelecaoPlaca = function(entradaSelecionada) {
     $scope.entrada = entradaSelecionada;
   }
+
+  $scope.possuiItensSincronizar = function() {
+    var possui = false;
+
+    if ($localStorage.estacionamento.sincronizar) {
+      possui = true;
+    }
+
+    if ($localStorage.despesas.filter(function(value){return value.sincronizar}).length > 0) {
+      possui = true;
+    }
+
+    if(possui) {
+      return 'assertive';
+    }  
+  }
+
+  $scope.sincronizar = function() {
+    $ionicLoading.show({
+      template: 'Sincronizando...'
+    });
+
+    $scope.sincronizar = {
+      configuracoes: false,
+      entradas: false,
+      saidas: false,
+      despesas: false
+    }
+
+    $scope.configuracoesSincronizadas = false;
+
+    if ($localStorage.estacionamento.sincronizar) {
+      delete $localStorage.estacionamento.sincronizar;
+      EstacionamentoService.salvar($localStorage.estacionamento).then(function(response){
+        $localStorage.estacionamento = response.data;
+        $scope.configuracoesSincronizadas = true;
+        $scope.sincronizar.configuracoes = true;
+        $scope.$broadcast('finaliza-sincronizacao');
+      }, function(erro){
+        $localStorage.estacionamento.sincronizar = true;
+        $scope.sincronizar.configuracoes = true;
+        $scope.$broadcast('finaliza-sincronizacao');
+      });
+    } else {
+      $scope.sincronizar.configuracoes = true;
+    }
+
+    $scope.qtdEntradasSincronizadas = 0;
+    var qtdEntradasSincronizar = $localStorage.entradas.filter(function(value) {return value.sincronizar && !value.datahora_saida}).length;
+    var contEntradas = 0;
+
+    if (qtdEntradasSincronizar == contEntradas) {
+      $scope.sincronizar.entradas = true;
+    } else {
+      $localStorage.entradas.forEach(function(elemento, index, array) {
+        if(elemento.sincronizar && !elemento.datahora_saida) {
+          delete elemento.sincronizar;
+          EntradaService.salvar(elemento).then(function(response){
+            $scope.qtdEntradasSincronizadas++;
+            var index = $localStorage.entradas.indexOf(response.config.data.entrada);
+            $localStorage.entradas[index] = response.data;
+            contEntradas++;
+            $scope.sincronizar.entradas = qtdEntradasSincronizar == contEntradas ? true : false;
+            $scope.$broadcast('finaliza-sincronizacao');
+          }, function(erro) {
+            var index = $localStorage.entradas.indexOf(erro.config.data.entrada);
+            $localStorage.entradas[index].sincronizar = true;
+            contEntradas++;
+            $scope.sincronizar.entradas = qtdEntradasSincronizar == contEntradas ? true : false;
+            $scope.$broadcast('finaliza-sincronizacao');
+          });
+        }
+      });
+    }
+
+    $scope.qtdSaidasSincronizadas = 0;
+    var qtdSaidasSincronizar = $localStorage.entradas.filter(function(value) {return value.sincronizar && value.datahora_saida}).length;
+    var contSaidas = 0;
+
+    if (qtdSaidasSincronizar == contSaidas) {
+      $scope.sincronizar.saidas = true;
+    } else {
+      $localStorage.entradas.forEach(function(elemento, index, array) {
+        if(elemento.sincronizar && elemento.datahora_saida) {
+          delete elemento.sincronizar;
+          EntradaService.salvar(elemento).then(function(response){
+            $scope.qtdSaidasSincronizadas++;
+            var index = $localStorage.entradas.indexOf(response.config.data.entrada);
+            $localStorage.entradas[index] = response.data;
+            contSaidas++;
+            $scope.sincronizar.saidas = qtdSaidasSincronizar == contSaidas ? true : false;
+            $scope.$broadcast('finaliza-sincronizacao');
+          }, function(erro) {
+            var index = $localStorage.entradas.indexOf(erro.config.data.entrada);
+            $localStorage.entradas[index].sincronizar = true;
+            contSaidas++;
+            $scope.sincronizar.saidas = qtdSaidasSincronizar == contSaidas ? true : false;
+            $scope.$broadcast('finaliza-sincronizacao');
+          });
+        }
+      });
+    }
+
+    $scope.qtdDespesasSincronizadas = 0;
+
+    var qtdDespesasSincronizar = $localStorage.despesas.filter(function(value) {return value.sincronizar}).length;
+    var contDespesas = 0;
+
+    if (qtdDespesasSincronizar == contDespesas) {
+      $scope.sincronizar.despesas = true;
+    } else {
+      $localStorage.despesas.forEach(function(elemento, index, array) {
+        if(elemento.sincronizar) {
+          delete elemento.sincronizar;
+          DespesaService.salvar(elemento).then(function(response){
+            $scope.qtdDespesasSincronizadas++;
+            var index = $localStorage.despesas.indexOf(response.config.data.despesa);
+            $localStorage.despesas[index] = response.data;
+            contDespesas++;
+            $scope.sincronizar.despesas = qtdDespesasSincronizar == contDespesas ? true : false;
+            $scope.$broadcast('finaliza-sincronizacao');
+          }, function(erro) {
+            var index = $localStorage.despesas.indexOf(erro.config.data.despesa);
+            $localStorage.despesas[index].sincronizar = true;
+            contDespesas++;
+            $scope.sincronizar.despesas = qtdDespesasSincronizar == contDespesas ? true : false;
+            $scope.$broadcast('finaliza-sincronizacao');
+          });
+        }
+      });
+    }
+
+  }
+
+  $scope.$on('finaliza-sincronizacao', function(event) {
+    if ($scope.sincronizar.configuracoes 
+        && $scope.sincronizar.entradas
+        && $scope.sincronizar.saidas
+        && $scope.sincronizar.despesas) {
+      $ionicPopup.alert({
+        title: 'Estacionar',
+        subTitle: 'Itens sincronizados:',
+        templateUrl: './templates/template-sincronizacao.html',
+        scope: $scope
+      });
+      $ionicLoading.hide();
+    }
+  });
+  
 })
 
 .controller('EntradaCtrl', function($scope, $localStorage, $cordovaBarcodeScanner, $ionicPopup, $ionicLoading, $state, EntradaService) {
@@ -380,29 +529,21 @@ angular.module('starter.controllers', [])
         $scope.container.datahora_entrada = date;
         $scope.container.id_estacionamento = $localStorage.estacionamento.id;
 
-        EntradaService.salvar($scope.container).then(function(response){
+        var dataHoraFormatada = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
 
-          var dataHoraFormatada = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+        $ionicLoading.hide();
 
-          $ionicLoading.hide();
-
-          var popup = $ionicPopup.alert({
-            title: 'Estacionar',
-            cssClass: 'text-center',
-            template: 'Entrada registrada com sucesso. Placa: ' + $scope.container.placa + ' - Data/Hora: ' + dataHoraFormatada
-          });
-
-          popup.then(function(res){
-            $state.go('tab.inicio');
-          });
-        }, function(erro) {
-          $ionicPopup.alert({
-            title: 'Estacionar',
-            cssClass: 'text-center',
-            template: 'Ocorreu um erro ao salvar a entrada.'
-          });
-          $ionicLoading.hide();
+        var popup = $ionicPopup.alert({
+          title: 'Estacionar',
+          cssClass: 'text-center',
+          template: 'Entrada registrada com sucesso. Placa: ' + $scope.container.placa + ' - Data/Hora: ' + dataHoraFormatada
         });
+
+        popup.then(function(res){
+          $state.go('tab.inicio');
+        });
+
+        $scope.$broadcast('salvar-entrada', $scope.container);
 
       } else {
         $ionicPopup.alert({
@@ -412,12 +553,24 @@ angular.module('starter.controllers', [])
         });
         $ionicLoading.hide();
       }
-   });
+    }, function(erro) {
+      $ionicLoading.hide();
+    });
   }
+
+  $scope.$on('salvar-entrada', function(event, entrada){
+    EntradaService.salvar(entrada).then(function(response){
+      $localStorage.entradas.push(response.data);
+    }, function(erro){
+      entrada.sincronizar = true;
+      $localStorage.entradas.push(entrada);
+      console.log(erro);
+    });
+  });
   
 })
 
-.controller('DespesaCtrl', function($scope, $cordovaBarcodeScanner, $localStorage, $ionicPopup, $ionicLoading, $state) {
+.controller('DespesaCtrl', function($scope, $cordovaBarcodeScanner, $localStorage, $ionicPopup, $ionicLoading, $state, DespesaService) {
 
   $scope.container = {
     data: new Date()
@@ -458,7 +611,8 @@ angular.module('starter.controllers', [])
       return;
     }
 
-    $localStorage.despesas.push($scope.container);
+    $scope.container.id_estacionamento = $localStorage.estacionamento.id;
+    $scope.$broadcast('salvar-despesa', $scope.container);
 
     $ionicPopup.alert({
       title: 'Estacionar',
@@ -474,9 +628,19 @@ angular.module('starter.controllers', [])
     $ionicLoading.hide();
   }
 
+  $scope.$on('salvar-despesa', function(event, despesa){
+    DespesaService.salvar(despesa).then(function(response){
+      $localStorage.despesas.push(response.data);
+    }, function(erro){
+      despesa.sincronizar = true;
+      $localStorage.despesas.push(despesa);
+      console.log(erro);
+    });
+  });
+
 })
 
-.controller('CaixaCtrl', function($scope, $localStorage) {
+.controller('CaixaCtrl', function($scope, $localStorage, EstacionamentoService) {
   
   $scope.data = new Date();
   $scope.data.setHours(0,0,0,0);
@@ -585,35 +749,32 @@ angular.module('starter.controllers', [])
       estacionamento: $scope.container
     }
 
-    EstacionamentoService.salvarEstacionamento(data).then(function(response){
+    $scope.$broadcast('salvar-estacionamento', $scope.container);
 
-      if(response.data.insertId) {
-        $scope.container.id = response.data.insertId;
-      }
-
-      $localStorage.estacionamento = $scope.container;
-      $rootScope.estacionamento = $scope.container;
-
-      $ionicPopup.alert({
-        title: 'Estacionar',
-        cssClass: 'text-center',
-        template: 'Configurações salvas com sucesso.'
-      });
+    var popup = $ionicPopup.alert({
+      title: 'Estacionar',
+      cssClass: 'text-center',
+      template: 'Configurações salvas com sucesso.'
+    });
       
-      //Finaliza o loading
-      $ionicLoading.hide();
-      
-    }, function(erro){
-      console.log(erro);
-      $ionicLoading.hide();
+    //Finaliza o loading
+    $ionicLoading.hide();
 
-      $ionicPopup.alert({
-        title: 'Estacionar',
-        cssClass: 'text-center',
-        template: 'Ocorreu um erro ao salvar as configurações. Por favor tente novamente.'
-      });
+    popup.then(function(res) {
+      $state.go('tab.inicio');
     });
   }
+
+  $scope.$on('salvar-estacionamento', function(event, estacionamento){
+    delete estacionamento.sincronizar;
+    EstacionamentoService.salvar(estacionamento).then(function(response){
+      $localStorage.estacionamento = response.data;
+    }, function(erro){
+      estacionamento.sincronizar = true;
+      $localStorage.estacionamento = estacionamento;
+      console.log(erro);
+    });
+  });
 
 })
 
@@ -623,7 +784,10 @@ angular.module('starter.controllers', [])
 
   $scope.versao = ESTACIONAR_CONFIG.VERSAO_APLICACAO;
 
-  if($localStorage.usuario) {
+  var dataAtual = new Date();
+  dataAtual.setHours(0, 0, 0, 0);
+
+  if($localStorage.usuario && $localStorage.usuario.dataLogin === dataAtual.toISOString()) {
     $state.go('tab.inicio');
   }
 
@@ -655,6 +819,11 @@ angular.module('starter.controllers', [])
     UsuarioService.autenticarUsuario($scope.data).then(function(response){
       
       $localStorage.usuario = response.data;
+
+      var dataAtual = new Date();
+      dataAtual.setHours(0, 0, 0, 0);
+
+      $localStorage.usuario.dataLogin = dataAtual;
 
       $ionicLoading.hide();
       $state.go('tab.inicio');

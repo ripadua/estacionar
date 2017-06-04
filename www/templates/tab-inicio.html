@@ -1,30 +1,35 @@
 <ion-view view-title="Início">
-  <ion-content class="padding">
-    <div class="card">
-    	<div class="item item-divider text-center">
-    		{{estacionamento.nome}}
-    	</div>
-    	<div class="row">
-    		<div class="col text-center">
-		    	Vagas Ocupadas: <br/><span class="fonte_vagas">{{vagas_ocupadas}}</span>
-		    </div>
-	    </div>
-    </div>
+    <ion-nav-buttons side="right">
+        <a ng-click="sincronizar()" ng-show="possuiItensSincronizar()" >
+            <i class="icon ion-android-sync" style="font-size: 30px"></i>
+        </a>
+    </ion-nav-buttons>
+    <ion-content class="padding">
+        <div class="card">
+        	<div class="item item-divider text-center">
+        		{{estacionamento.nome}}
+        	</div>
+        	<div class="row">
+        		<div class="col text-center">
+    		    	Vagas Ocupadas: <br/><span class="fonte_vagas">{{vagas_ocupadas}}</span>
+    		    </div>
+    	    </div>
+        </div>
 	
-	<div class="row">
-		<div class="col"> 
-	    	<button class="button icon-center ion-plus button-balanced button-large" style="float:right; width: 120px; font-size:40px" ng-click="registrarEntrada()"><span style="font-size: 20px; display:block">Entrada</span></button>
-		</div>
-		<div class="col">
-	    	<button class="button icon-center ion-minus button-assertive button-large" style="width: 120px; font-size:40px" ng-click="registrarSaidaCartao()"><span style="font-size: 20px; display:block">Saída</span></button>
-		</div>
-    </div>
-    <br/>
-    <br/>
-    <div class="row text-center">
-    	<div class="col text-center">
-    		<a ng-click="registrarSaidaPlaca()" ng-if="vagas_ocupadas > 0">Perdeu o cartão?</a>
-    	</div>
-    </div>
-  </ion-content>
+    	<div class="row">
+    		<div class="col"> 
+    	    	<button class="button icon-center ion-plus button-balanced button-large" style="float:right; width: 120px; font-size:40px" ng-click="registrarEntrada()"><span style="font-size: 20px; display:block">Entrada</span></button>
+    		</div>
+    		<div class="col">
+    	    	<button class="button icon-center ion-minus button-assertive button-large" style="width: 120px; font-size:40px" ng-click="registrarSaidaCartao()"><span style="font-size: 20px; display:block">Saída</span></button>
+    		</div>
+        </div>
+        <br/>
+        <br/>
+        <div class="row text-center">
+        	<div class="col text-center">
+        		<a ng-click="registrarSaidaPlaca()" ng-if="vagas_ocupadas > 0">Perdeu o cartão?</a>
+        	</div>
+        </div>
+    </ion-content>
 </ion-view>

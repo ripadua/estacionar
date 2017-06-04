@@ -28,8 +28,19 @@ angular.module('starter.services', [])
     return $http.get(ESTACIONAR_CONFIG.SERVIDOR + '/estacionamentos/' + id + "/entradas");
   }
 
-  this.salvarEstacionamento = function(estacionamento) {
-    return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos", estacionamento);
+  this.listarDespesasPorId = function(id) {
+    return $http.get(ESTACIONAR_CONFIG.SERVIDOR + '/estacionamentos/' + id + "/despesas");
+  }
+
+  this.salvar = function(estacionamento) {
+    var data = {
+      estacionamento: estacionamento
+    }
+    if (data.estacionamento.id) {
+      return $http.put(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos", data);
+    } else {
+      return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/estacionamentos", data);
+    }
   }
 })
 
@@ -52,6 +63,21 @@ angular.module('starter.services', [])
       return $http.put(ESTACIONAR_CONFIG.SERVIDOR + "/entradas", data);
     } else {
       return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/entradas", data);
+    }
+  }
+
+})
+
+.service('DespesaService', function($http, ESTACIONAR_CONFIG) {
+  
+  this.salvar = function(despesa) {
+    var data = {
+      despesa: despesa
+    }
+    if (data.despesa.id) {
+      return $http.put(ESTACIONAR_CONFIG.SERVIDOR + "/despesas", data);
+    } else {
+      return $http.post(ESTACIONAR_CONFIG.SERVIDOR + "/despesas", data);
     }
   }
 
