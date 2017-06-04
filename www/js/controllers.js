@@ -100,7 +100,24 @@ angular.module('starter.controllers', [])
       $localStorage.estacionamento = $scope.estacionamento;
     });
     
-    $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+    EstacionamentoService.listarEntradasPorId($scope.estacionamento.id).then(function(response){
+      for(var x in response.data) {
+        var naoExiste = $localStorage.entradas.filter(function(value){ return value.id == response.data[x].id}).length == 0;
+        if (naoExiste) {
+          $localStorage.entradas.push(response.data[x]);
+        }
+      }
+      $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
+    });
+
+    EstacionamentoService.listarDespesasPorId($scope.estacionamento.id).then(function(response){
+      for(var x in response.data) {
+        var naoExiste = $localStorage.despesas.filter(function(value){ return value.id == response.data[x].id}).length == 0;
+        if (naoExiste) {
+          $localStorage.despesas.push(response.data[x]);
+        }
+      }
+    });
   }
 
   $scope.$on('atualizar-estacionamento', function(event){
@@ -670,17 +687,17 @@ angular.module('starter.controllers', [])
       var dataSaida = new Date(value.datahora_saida);
       return value 
           && value.datahora_saida 
-          && dataSaida.getDate() == $scope.data.getDate()
-          && dataSaida.getMonth() == $scope.data.getMonth()
-          && dataSaida.getFullYear() == $scope.data.getFullYear();
+          && dataSaida.getUTCDate() == $scope.data.getUTCDate()
+          && dataSaida.getUTCMonth() == $scope.data.getUTCMonth()
+          && dataSaida.getUTCFullYear() == $scope.data.getUTCFullYear();
     });
     $scope.despesas = $localStorage.despesas.filter(function(value){
       var dataDespesa = new Date(value.data);
       return value
           && value.data
-          && dataDespesa.getDate() == $scope.data.getDate()
-          && dataDespesa.getMonth() == $scope.data.getMonth()
-          && dataDespesa.getFullYear() == $scope.data.getFullYear();
+          && dataDespesa.getUTCDate() == $scope.data.getUTCDate()
+          && dataDespesa.getUTCMonth() == $scope.data.getUTCMonth()
+          && dataDespesa.getUTCFullYear() == $scope.data.getUTCFullYear();
     });
 
     $scope.total_receitas = 0;
@@ -710,9 +727,9 @@ angular.module('starter.controllers', [])
 
   $scope.mostrarDataProxima = function() {
     var dataAtual = new Date();
-    return $scope.data.getDate() < dataAtual.getDate()
-        && $scope.data.getMonth() <= dataAtual.getMonth()
-        && $scope.data.getFullYear() <= dataAtual.getFullYear();
+    return $scope.data.getUTCDate() < dataAtual.getUTCDate()
+        && $scope.data.getUTCMonth() <= dataAtual.getUTCMonth()
+        && $scope.data.getUTCFullYear() <= dataAtual.getUTCFullYear();
   }
 
   $scope.toggleGroup = function(group) {
