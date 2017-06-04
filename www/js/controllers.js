@@ -102,6 +102,10 @@ angular.module('starter.controllers', [])
     
     $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
   }
+
+  $scope.$on('atualizar-estacionamento', function(event){
+    $scope.estacionamento = $localStorage.estacionamento;
+  });
 })
 
 .controller('InicioCtrl', function($scope, $rootScope, $localStorage, $state, $cordovaBarcodeScanner, $ionicPopup, $ionicLoading, EntradaService, EstacionamentoService, DespesaService) {
@@ -203,6 +207,8 @@ angular.module('starter.controllers', [])
               cssClass: 'text-center',
               template: 'Saída realizada com sucesso.'
             });
+
+            $scope.$broadcast('salvar-saida', $scope.saida);
           }
         }
       ]
@@ -531,6 +537,7 @@ angular.module('starter.controllers', [])
 
         var dataHoraFormatada = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
 
+        $scope.$broadcast('salvar-entrada', $scope.container);
         $ionicLoading.hide();
 
         var popup = $ionicPopup.alert({
@@ -543,7 +550,6 @@ angular.module('starter.controllers', [])
           $state.go('tab.inicio');
         });
 
-        $scope.$broadcast('salvar-entrada', $scope.container);
 
       } else {
         $ionicPopup.alert({
@@ -768,7 +774,9 @@ angular.module('starter.controllers', [])
   $scope.$on('salvar-estacionamento', function(event, estacionamento){
     delete estacionamento.sincronizar;
     EstacionamentoService.salvar(estacionamento).then(function(response){
-      $localStorage.estacionamento = response.data;
+      estacionamento.id = response.data.id;
+      $localStorage.estacionamento = estacionamento;
+      $rootScope.$broadcast('atualizar-estacionamento');
     }, function(erro){
       estacionamento.sincronizar = true;
       $localStorage.estacionamento = estacionamento;
