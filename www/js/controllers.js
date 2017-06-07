@@ -251,6 +251,11 @@ angular.module('starter.controllers', [])
   $scope.registrarSaidaCartao = function() {
 
     $cordovaBarcodeScanner.scan().then(function(imageData){
+
+      if (imageData.cancelled) {
+        return;
+      }
+      
       var dadosQrCode = JSON.parse(imageData.text);
       //var dadosQrCode = {"sistema":"estacionar","cartao":"4"};
       if (dadosQrCode.sistema == 'estacionar') {
@@ -534,6 +539,10 @@ angular.module('starter.controllers', [])
 
     $cordovaBarcodeScanner.scan().then(function(imageData){
 
+      if (imageData.cancelled) {
+        return;
+      }
+
       //Executa o loading
       $ionicLoading.show({});
 
@@ -599,7 +608,7 @@ angular.module('starter.controllers', [])
   
 })
 
-.controller('DespesaCtrl', function($scope, $cordovaBarcodeScanner, $localStorage, $ionicPopup, $ionicLoading, $state, DespesaService) {
+.controller('DespesaCtrl', function($scope, $localStorage, $ionicPopup, $ionicLoading, $state, DespesaService) {
 
   $scope.container = {
     data: new Date()
