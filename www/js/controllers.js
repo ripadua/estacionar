@@ -487,7 +487,7 @@ angular.module('starter.controllers', [])
       });
 
       popup.then(function(res){
-        $state.go('tab.configuracoes');
+        //$state.go('tab.configuracoes');
       });
     } else {
       $scope.container = {
@@ -499,12 +499,12 @@ angular.module('starter.controllers', [])
     }
   }
 
-  //validarTiposVeiculos();
+  validarTiposVeiculos();
   
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.entrada') {
-        //validarTiposVeiculos();
+        validarTiposVeiculos();
         
       }
     }
