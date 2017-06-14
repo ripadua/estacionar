@@ -255,7 +255,7 @@ angular.module('starter.controllers', [])
       if (imageData.cancelled) {
         return;
       }
-      
+
       var dadosQrCode = JSON.parse(imageData.text);
       //var dadosQrCode = {"sistema":"estacionar","cartao":"4"};
       if (dadosQrCode.sistema == 'estacionar') {
@@ -499,12 +499,12 @@ angular.module('starter.controllers', [])
     }
   }
 
-  validarTiposVeiculos();
+  //validarTiposVeiculos();
   
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
       if (toState.name == 'tab.entrada') {
-        validarTiposVeiculos();
+        //validarTiposVeiculos();
         
       }
     }
@@ -702,17 +702,17 @@ angular.module('starter.controllers', [])
       var dataSaida = new Date(value.datahora_saida);
       return value 
           && value.datahora_saida 
-          && dataSaida.getUTCDate() == $scope.data.getUTCDate()
-          && dataSaida.getUTCMonth() == $scope.data.getUTCMonth()
-          && dataSaida.getUTCFullYear() == $scope.data.getUTCFullYear();
+          && dataSaida.getDate() == $scope.data.getDate()
+          && dataSaida.getMonth() == $scope.data.getMonth()
+          && dataSaida.getFullYear() == $scope.data.getFullYear();
     });
     $scope.despesas = $localStorage.despesas.filter(function(value){
       var dataDespesa = new Date(value.data);
       return value
           && value.data
-          && dataDespesa.getUTCDate() == $scope.data.getUTCDate()
-          && dataDespesa.getUTCMonth() == $scope.data.getUTCMonth()
-          && dataDespesa.getUTCFullYear() == $scope.data.getUTCFullYear();
+          && dataDespesa.getDate() == $scope.data.getDate()
+          && dataDespesa.getMonth() == $scope.data.getMonth()
+          && dataDespesa.getFullYear() == $scope.data.getFullYear();
     });
 
     $scope.total_receitas = 0;
@@ -742,9 +742,9 @@ angular.module('starter.controllers', [])
 
   $scope.mostrarDataProxima = function() {
     var dataAtual = new Date();
-    return $scope.data.getUTCDate() < dataAtual.getUTCDate()
-        && $scope.data.getUTCMonth() <= dataAtual.getUTCMonth()
-        && $scope.data.getUTCFullYear() <= dataAtual.getUTCFullYear();
+    return $scope.data.getDate() < dataAtual.getDate()
+        && $scope.data.getMonth() <= dataAtual.getMonth()
+        && $scope.data.getFullYear() <= dataAtual.getFullYear();
   }
 
   $scope.toggleGroup = function(group) {
