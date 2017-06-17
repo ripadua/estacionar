@@ -36,8 +36,8 @@
 				                    ng-show="isGroupShown(receita)">
 				            	<div>
 									<p><span><strong>Placa:</strong> {{receita.placa}}</span></p>
-									<p><span><strong>Entrada:</strong> {{receita.datahora_entrada | date: 'HH:mm'}}</span><p>
-									<p><span><strong>Saída:</strong> {{receita.datahora_saida | date: 'HH:mm'}}</span></p>
+									<p><span><strong>Entrada:</strong> {{receita.datahora_entrada | date: 'HH:mm' : '+00:00'}}</span><p>
+									<p><span><strong>Saída:</strong> {{receita.datahora_saida | date: 'HH:mm' : '+00:00'}}</span></p>
 								</div>
           					</ion-item>
 		    			</div>
@@ -57,7 +57,6 @@
 				          	<ion-item class="item-accordion"
 				                    ng-show="isGroupShown(despesa)">
 				                   <div>
-				            			<p><span><strong>Hora:</strong> {{despesa.data | date: 'HH:mm'}}</span></p>
 				            			<p><span><strong>Desc:</strong> {{despesa.descricao}}</span></p>
 				                   </div>
           					</ion-item>

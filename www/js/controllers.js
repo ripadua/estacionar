@@ -149,7 +149,7 @@ angular.module('starter.controllers', [])
 
   function registrarSaida(entrada, multa) {
     var dataHoraSaida = new Date();
-    var diferencaMinutos = Math.abs(dataHoraSaida - new Date(entrada.datahora_entrada))/1000/60;
+    var diferencaMinutos = Math.abs(dataHoraSaida - new Date(entrada.datahora_entrada.replace("Z", "-03:00")))/1000/60;
     diferencaMinutos = Math.round(diferencaMinutos);
     
     var totalAPagar = 0;
@@ -196,6 +196,7 @@ angular.module('starter.controllers', [])
     var minutos = pad.substring(0, pad.length - strMinutos.length) + strMinutos;
 
     entrada.total_tempo_formatado = horas + ":" + minutos;
+    entrada.datahora_entrada = new Date(entrada.datahora_entrada.replace("Z", "-03:00"));
     entrada.datahora_saida = dataHoraSaida;
     entrada.total_tempo = diferencaMinutos;
     entrada.valor_pago = totalAPagar;
@@ -323,7 +324,7 @@ angular.module('starter.controllers', [])
   $scope.possuiItensSincronizar = function() {
     var possui = false;
 
-    if ($localStorage.estacionamento.sincronizar) {
+    if ($localStorage.estacionamento && $localStorage.estacionamento.sincronizar) {
       possui = true;
     }
 
@@ -499,7 +500,7 @@ angular.module('starter.controllers', [])
     }
   }
 
-  validarTiposVeiculos();
+  //validarTiposVeiculos();
   
   $scope.$on('$stateChangeSuccess', 
     function(event, toState, toParams, fromState, fromParams){ 
@@ -547,7 +548,7 @@ angular.module('starter.controllers', [])
       $ionicLoading.show({});
 
       var dadosQrCode = JSON.parse(imageData.text);
-      //var dadosQrCode = {"sistema":"estacionar","cartao":"4"};
+      //var dadosQrCode = {"sistema":"estacionar","cartao":"13"};
       if (dadosQrCode.sistema == 'estacionar') {
         $scope.container.cartao = dadosQrCode.cartao;
 
@@ -699,7 +700,7 @@ angular.module('starter.controllers', [])
     $scope.receitas = [];
     $scope.despesas = [];
     $scope.receitas = $localStorage.entradas.filter(function(value){
-      var dataSaida = new Date(value.datahora_saida);
+      var dataSaida = new Date(value.datahora_saida.replace("Z", "-03:00"));
       return value 
           && value.datahora_saida 
           && dataSaida.getDate() == $scope.data.getDate()
@@ -707,7 +708,7 @@ angular.module('starter.controllers', [])
           && dataSaida.getFullYear() == $scope.data.getFullYear();
     });
     $scope.despesas = $localStorage.despesas.filter(function(value){
-      var dataDespesa = new Date(value.data);
+      var dataDespesa = new Date(value.data.replace("Z", "-03:00"));
       return value
           && value.data
           && dataDespesa.getDate() == $scope.data.getDate()

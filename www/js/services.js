@@ -56,12 +56,7 @@ angular.module('starter.services', [])
   
   this.salvar = function(entrada) {
     delete entrada.total_tempo_formatado;
-    entrada.datahora_entrada = entrada.datahora_entrada.toLocaleString();
-
-    if (entrada.datahora_saida) {
-      entrada.datahora_saida = entrada.datahora_saida.toLocaleString();      
-    }
-
+    
     var data = {
       entrada: entrada
     }
@@ -77,7 +72,6 @@ angular.module('starter.services', [])
 .service('DespesaService', function($http, ESTACIONAR_CONFIG) {
   
   this.salvar = function(despesa) {
-    despesa.data = despesa.data.toLocaleString();
     var data = {
       despesa: despesa
     }
