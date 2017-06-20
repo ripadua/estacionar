@@ -103,21 +103,26 @@ angular.module('starter.controllers', [])
     });
     
     EstacionamentoService.listarEntradasPorId($scope.estacionamento.id).then(function(response){
+      $localStorage.entradas = $localStorage.entradas.filter(function(value){ return value.sincronizar});
+
       for(var x in response.data) {
         var naoExiste = $localStorage.entradas.filter(function(value){ return value.id == response.data[x].id}).length == 0;
         if (naoExiste) {
           $localStorage.entradas.push(response.data[x]);
         }
       }
+
       $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
     });
 
     EstacionamentoService.listarDespesasPorId($scope.estacionamento.id).then(function(response){
+      $localStorage.despesas = $localStorage.despesas.filter(function(value){ return value.sincronizar});
+
       for(var x in response.data) {
         var naoExiste = $localStorage.despesas.filter(function(value){ return value.id == response.data[x].id}).length == 0;
         if (naoExiste) {
           $localStorage.despesas.push(response.data[x]);
-        }
+        } 
       }
     });
   }
@@ -700,20 +705,20 @@ angular.module('starter.controllers', [])
     $scope.receitas = [];
     $scope.despesas = [];
     $scope.receitas = $localStorage.entradas.filter(function(value){
-      var dataSaida = new Date(value.datahora_saida.replace("Z", "-03:00"));
+      var dataSaida = new Date(value.datahora_saida);
       return value 
           && value.datahora_saida 
-          && dataSaida.getDate() == $scope.data.getDate()
-          && dataSaida.getMonth() == $scope.data.getMonth()
-          && dataSaida.getFullYear() == $scope.data.getFullYear();
+          && dataSaida.getUTCDate() == $scope.data.getDate()
+          && dataSaida.getUTCMonth() == $scope.data.getMonth()
+          && dataSaida.getUTCFullYear() == $scope.data.getFullYear();
     });
     $scope.despesas = $localStorage.despesas.filter(function(value){
-      var dataDespesa = new Date(value.data.replace("Z", "-03:00"));
+      var dataDespesa = new Date(value.data);
       return value
           && value.data
-          && dataDespesa.getDate() == $scope.data.getDate()
-          && dataDespesa.getMonth() == $scope.data.getMonth()
-          && dataDespesa.getFullYear() == $scope.data.getFullYear();
+          && dataDespesa.getUTCDate() == $scope.data.getDate()
+          && dataDespesa.getUTCMonth() == $scope.data.getMonth()
+          && dataDespesa.getUTCFullYear() == $scope.data.getFullYear();
     });
 
     $scope.total_receitas = 0;
