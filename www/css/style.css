@@ -1,19 +1,17 @@
 /* Empty. Add your own CSS if you like */
 .campo_placa {
-	font-size: 25px !important;
-    width: 39px !important;
-    text-align: center;
+	  font-size: 40px !important;
+    width: 100% !important;
     text-transform: uppercase !important;
-    display: inline-block !important;
     border-color: #ddd !important;
     border-width: 1px !important;
     border-style: solid !important;
     color: #444 !important;
     text-align: center !important;
-    padding: 0px !important;
-    margin: 0px !important;
     vertical-align: top !important;
-    height: 50px !important;
+    height: 55px !important;
+    letter-spacing: 10px;
+    padding-left: 10px !important;
 }
 
 .fonte_vagas {

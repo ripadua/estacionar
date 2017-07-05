@@ -6,13 +6,8 @@
       </ion-list>
       <span class="input-label">Placa:</span>
       <div class="text-center" style="margin-bottom: 20px;">
-        <input type="text" ng-model="placa.placa_1" maxlength="1" class="campo_placa" move-next-on-maxlength mask="@" mask-restrict='reject'></input>
-        <input type="text" ng-model="placa.placa_2" maxlength="1" class="campo_placa" move-next-on-maxlength mask="@" mask-restrict='reject'></input>
-        <input type="text" ng-model="placa.placa_3" maxlength="1" class="campo_placa" move-next-on-maxlength mask="@" mask-restrict='reject'></input>
-        <input type= "tel" ng-model="placa.placa_4" maxlength="1" class="campo_placa" move-next-on-maxlength mask="9" mask-restrict='reject'></input>
-        <input type= "tel" ng-model="placa.placa_5" maxlength="1" class="campo_placa" move-next-on-maxlength mask="9" mask-restrict='reject'></input>
-        <input type= "tel" ng-model="placa.placa_6" maxlength="1" class="campo_placa" move-next-on-maxlength mask="9" mask-restrict='reject'></input>
-        <input type= "tel" ng-model="placa.placa_7" maxlength="1" class="campo_placa" action-on-maxlength action="lerCartao" mask="9" mask-restrict='reject'></input>
+        <input type="text" ng-model="container.placa" maxlength="7" class="campo_placa"
+            mask="@@@9999" mask-clean="true" mask-restrict='reject' action-on-maxlength action="lerCartao" />
       </div>
     </form>
     <button id="lerCartao" class="button button-positive button-block icon-right ion-qr-scanner" ng-click="lerCartao()">Ler cartão</button>

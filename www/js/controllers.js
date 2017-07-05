@@ -101,7 +101,7 @@ angular.module('starter.controllers', [])
     }, function(erro){
       $localStorage.estacionamento = $scope.estacionamento;
     });
-    
+
     EstacionamentoService.listarEntradasPorId($scope.estacionamento.id).then(function(response){
       $localStorage.entradas = $localStorage.entradas.filter(function(value){ return value.sincronizar});
 
@@ -122,7 +122,7 @@ angular.module('starter.controllers', [])
         var naoExiste = $localStorage.despesas.filter(function(value){ return value.id == response.data[x].id}).length == 0;
         if (naoExiste) {
           $localStorage.despesas.push(response.data[x]);
-        } 
+        }
       }
     });
   }
@@ -138,8 +138,8 @@ angular.module('starter.controllers', [])
 
   $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
 
-  $scope.$on('$stateChangeSuccess', 
-    function(event, toState, toParams, fromState, fromParams){ 
+  $scope.$on('$stateChangeSuccess',
+    function(event, toState, toParams, fromState, fromParams){
       if (toState.name == 'tab.inicio') {
         if ($localStorage.estacionamento) {
           $rootScope.vagas_ocupadas = $localStorage.entradas.filter(function(value){ return value && !value.datahora_saida}).length;
@@ -156,7 +156,7 @@ angular.module('starter.controllers', [])
     var dataHoraSaida = new Date();
     var diferencaMinutos = Math.abs(dataHoraSaida - new Date(entrada.datahora_entrada.replace("Z", "-03:00")))/1000/60;
     diferencaMinutos = Math.round(diferencaMinutos);
-    
+
     var totalAPagar = 0;
     var estacionamentoValor = $localStorage.estacionamento.estacionamentoValores.filter(function(value){return value.id_tipo_veiculo == entrada.id_tipo_veiculo})[0];
     var valor_primeira_hora = estacionamentoValor.valor_primeira_hora;
@@ -343,7 +343,7 @@ angular.module('starter.controllers', [])
 
     if(possui) {
       return 'assertive';
-    }  
+    }
   }
 
   $scope.sincronizar = function() {
@@ -464,7 +464,7 @@ angular.module('starter.controllers', [])
   }
 
   $scope.$on('finaliza-sincronizacao', function(event) {
-    if ($scope.sincronizar.configuracoes 
+    if ($scope.sincronizar.configuracoes
         && $scope.sincronizar.entradas
         && $scope.sincronizar.saidas
         && $scope.sincronizar.despesas) {
@@ -477,41 +477,43 @@ angular.module('starter.controllers', [])
       $ionicLoading.hide();
     }
   });
-  
+
 })
 
 .controller('EntradaCtrl', function($scope, $localStorage, $cordovaBarcodeScanner, $ionicPopup, $ionicLoading, $state, EntradaService) {
-  
+
   function validarTiposVeiculos() {
+
     $scope.tiposVeiculos = $localStorage.estacionamento.estacionamentoValores.filter(function(value){return value.valor_primeira_hora && value.valor_primeira_hora > 0});
 
     if ($scope.tiposVeiculos.length == 0) {
+
       var popup = $ionicPopup.alert({
         title: 'Estacionar',
         cssClass: 'text-center',
         template: 'É necessário configurar os valores de cobrança para os tipos de veículos para realizar uma entrada.'
       });
 
+
       popup.then(function(res){
         //$state.go('tab.configuracoes');
       });
-    } else {
-      $scope.container = {
-        id_tipo_veiculo: $scope.tiposVeiculos[0].id_tipo_veiculo,
-        placa: null,
-        datahora_entrada: new Date()
-      };
-      $scope.placa = {};
     }
+
+    $scope.container = {
+      id_tipo_veiculo: $scope.tiposVeiculos[0].id_tipo_veiculo,
+      placa: "",
+      datahora_entrada: new Date()
+    };
   }
 
   //validarTiposVeiculos();
-  
-  $scope.$on('$stateChangeSuccess', 
-    function(event, toState, toParams, fromState, fromParams){ 
+
+  $scope.$on('$stateChangeSuccess',
+    function(event, toState, toParams, fromState, fromParams){
       if (toState.name == 'tab.entrada') {
         validarTiposVeiculos();
-        
+
       }
     }
   );
@@ -526,12 +528,6 @@ angular.module('starter.controllers', [])
       return;
     }
 
-    $scope.container.placa = "";
-    for(var i = 1; i <= 7; i++) {
-      if ($scope.placa['placa_'+i]) {
-        $scope.container.placa += $scope.placa['placa_'+i];
-      }
-    }
     $scope.container.placa = $scope.container.placa.toUpperCase();
 
     if ($scope.container.placa.length < 7) {
@@ -611,7 +607,7 @@ angular.module('starter.controllers', [])
       console.log(erro);
     });
   });
-  
+
 })
 
 .controller('DespesaCtrl', function($scope, $localStorage, $ionicPopup, $ionicLoading, $state, DespesaService) {
@@ -620,14 +616,14 @@ angular.module('starter.controllers', [])
     data: new Date()
   }
 
-  $scope.$on('$stateChangeSuccess', 
-    function(event, toState, toParams, fromState, fromParams){ 
+  $scope.$on('$stateChangeSuccess',
+    function(event, toState, toParams, fromState, fromParams){
       if (toState.name == 'tab.despesa') {
         $scope.container = {
           data: new Date()
         }
       }
-    } 
+    }
   );
 
   $scope.salvar = function() {
@@ -663,7 +659,7 @@ angular.module('starter.controllers', [])
       cssClass: 'text-center',
       template: 'Despesa registrada com sucesso.'
     });
-    
+
     $scope.container = {
       data: new Date()
     }
@@ -685,16 +681,16 @@ angular.module('starter.controllers', [])
 })
 
 .controller('CaixaCtrl', function($scope, $localStorage, EstacionamentoService) {
-  
+
   $scope.data = new Date();
   $scope.data.setHours(0,0,0,0);
- 
+
   calcularTotais();
 
-  $scope.$on('$stateChangeSuccess', 
-    function(event, toState, toParams, fromState, fromParams){ 
+  $scope.$on('$stateChangeSuccess',
+    function(event, toState, toParams, fromState, fromParams){
       if (toState.name == 'tab.caixa') {
-        
+
 
         calcularTotais();
       }
@@ -706,8 +702,8 @@ angular.module('starter.controllers', [])
     $scope.despesas = [];
     $scope.receitas = $localStorage.entradas.filter(function(value){
       var dataSaida = new Date(value.datahora_saida);
-      return value 
-          && value.datahora_saida 
+      return value
+          && value.datahora_saida
           && dataSaida.getUTCDate() == $scope.data.getDate()
           && dataSaida.getUTCMonth() == $scope.data.getMonth()
           && dataSaida.getUTCFullYear() == $scope.data.getFullYear();
@@ -767,7 +763,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('ConfiguracoesCtrl', function($scope, $localStorage, $ionicPopup, $ionicLoading, $state, $rootScope, EstacionamentoService, TipoVeiculoService) {
-  
+
   $scope.usuario = $localStorage.usuario || {};
   $scope.container = $localStorage.estacionamento || {};
 
@@ -784,7 +780,7 @@ angular.module('starter.controllers', [])
   }
 
   $scope.salvar = function() {
-    
+
     //Executa o loading
     $ionicLoading.show({});
     $scope.container.id_usuario = $localStorage.usuario.id;
@@ -800,7 +796,7 @@ angular.module('starter.controllers', [])
       cssClass: 'text-center',
       template: 'Configurações salvas com sucesso.'
     });
-      
+
     //Finaliza o loading
     $ionicLoading.hide();
 
@@ -838,7 +834,7 @@ angular.module('starter.controllers', [])
   }
 
   $scope.entrar = function() {
-    
+
     //Executa o loading
     $ionicLoading.show({});
 
@@ -863,7 +859,7 @@ angular.module('starter.controllers', [])
     }
 
     UsuarioService.autenticarUsuario($scope.data).then(function(response){
-      
+
       $localStorage.usuario = response.data;
 
       var dataAtual = new Date();
