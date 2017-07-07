@@ -6,8 +6,9 @@
       </ion-list>
       <span class="input-label">Placa:</span>
       <div class="text-center" style="margin-bottom: 20px;">
-        <input type="text" ng-model="container.placa" maxlength="7" class="campo_placa"
-            mask="@@@9999" mask-clean="true" mask-restrict='reject' action-on-maxlength action="lerCartao" />
+        <input type="{{tipoInput}}" ng-model="container.placa" maxlength="7" class="campo_placa"
+            
+            mask="@@@9999" mask-clean="true" mask-restrict='reject'/>
       </div>
     </form>
     <button id="lerCartao" class="button button-positive button-block icon-right ion-qr-scanner" ng-click="lerCartao()">Ler cartão</button>

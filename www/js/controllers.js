@@ -482,6 +482,16 @@ angular.module('starter.controllers', [])
 
 .controller('EntradaCtrl', function($scope, $localStorage, $cordovaBarcodeScanner, $ionicPopup, $ionicLoading, $state, EntradaService) {
 
+  $scope.tipoInput = "text";
+
+  $scope.alterarTipoInput = function() {
+      if ($scope.container.placa && $scope.container.placa.length >= 3) {
+        $scope.tipoInput = "tel";
+      } else {
+        $scope.tipoInput = "text";
+      }
+  }
+
   function validarTiposVeiculos() {
 
     $scope.tiposVeiculos = $localStorage.estacionamento.estacionamentoValores.filter(function(value){return value.valor_primeira_hora && value.valor_primeira_hora > 0});
@@ -507,7 +517,7 @@ angular.module('starter.controllers', [])
     };
   }
 
-  //validarTiposVeiculos();
+  validarTiposVeiculos();
 
   $scope.$on('$stateChangeSuccess',
     function(event, toState, toParams, fromState, fromParams){
